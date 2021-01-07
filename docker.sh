@@ -1,6 +1,6 @@
 FROM alpine:latest
 
-LABEL MAINTAINER="Janakiram MSV <janakiramm@gmail.com>"
+LABEL MAINTAINER="Tristan Howells <tristanhowells@gmail.com>"
 
 # Linking of locale.h as xlocale.h
 # This is done to ensure successfull install of python numpy package
