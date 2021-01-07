@@ -49,6 +49,9 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 
+DATA_FILE_SAMPLES = 5
+EPISODES = 1001
+
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
     return [ filename for filename in filenames if filename.endswith( suffix ) ]
@@ -89,8 +92,8 @@ def observation_window(window):
         else:
             current_price = window.iloc[e + OBSERVATION_WINDOW][3]
         
-        detrend(observation_window)   
-        scaler.transform(observation_window)
+        observation_window = detrend(observation_window)
+        observation_window = scaler.transform(observation_window)
         
         output = (observation_window, current_price)
        
@@ -100,9 +103,7 @@ def observation_window(window):
 
 # for paperspace instance
 path = r'/storage/data/'
-
-# for local instance
-#path = r'C:\Users\trist\OneDrive\Documents\python\asx_data'
+# path = r'C:\Users\trist\OneDrive\Documents\python\asx_data'
 
 files = find_csv_filenames(path)
 
@@ -110,10 +111,7 @@ print("number of samples: " , len(files))
 
 original_files = shuffle(files)
 print('shuffled files: ' ,len(original_files))
-files = original_files[0:10]
-# test = [x for x in original_files if x not in files]
-
-# print('files: ', len(files), ' test: ', len(test))
+files = original_files[0:DATA_FILE_SAMPLES]
 
 master_data = []
 
@@ -135,18 +133,21 @@ for file in files:
         counter += 1
         cob = observation_window(data[i])
         all_data.append(cob)
-        print(file, " observation_window: ", counter, " of ", len(data))
+        if i%500==0:
+            print(file, " observation_window: ", counter, " of ", len(data))
+            print(cob)
 
     master_data.extend(all_data)
 
 shuffled_data = shuffle(master_data, random_state=0)
 
 # Environment settings
-# EPISODES = len(shuffled_data[0:1001])
+# EPISODES = len(shuffled_data[0:EPISODES])
 
 print("Shuffled Data Len: ", len(shuffled_data))
 
 EPISODES = len(shuffled_data)
+
 
 class Trader:
     
