@@ -133,9 +133,6 @@ for file in files:
         counter += 1
         cob = observation_window(data[i])
         all_data.append(cob)
-        if i%500==0:
-            print(file, " observation_window: ", counter, " of ", len(data))
-            print(cob)
 
     master_data.extend(all_data)
 
