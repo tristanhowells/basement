@@ -102,7 +102,7 @@ def observation_window(window):
     return observation_windows
 
 # for paperspace instance
-path = r'storage/data/'
+path = r'/storage/data/'
 # path = r'C:\Users\trist\OneDrive\Documents\python\asx_data'
 
 files = find_csv_filenames(path)
