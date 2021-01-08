@@ -84,7 +84,7 @@ def observation_window(window):
     
     for e in range(EPISODE_STEPS):
         window_start = e
-        window_end = e + OBSERVATION_WINDOW
+        window_end = e + OBSERVATION_WINDOW + 1
         observation_window = window[window_start:window_end].to_numpy()
            
         if e < EPISODE_STEPS-1:
