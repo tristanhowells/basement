@@ -50,7 +50,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 ### build Episodes
 
 DATA_FILE_SAMPLES = 5
-EPISODES = 1001
+# EPISODES = 1001
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -144,6 +144,8 @@ shuffled_data = shuffle(master_data, random_state=0)
 print("Shuffled Data Len: ", len(shuffled_data))
 
 EPISODES = len(shuffled_data)
+
+print("Number of Episodes: ", len(EPISODES))
 
 
 class Trader:
