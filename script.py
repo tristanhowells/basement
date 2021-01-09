@@ -145,7 +145,7 @@ print("Shuffled Data Len: ", len(shuffled_data))
 
 EPISODES = len(shuffled_data)
 
-print("Number of Episodes: ", len(EPISODES))
+print("Number of Episodes: ", EPISODES)
 
 
 class Trader:
