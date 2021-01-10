@@ -5,6 +5,8 @@
 # pip install tqdm
 # pip install scikit-learn
 
+print("Script Accessed...")
+
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import Sequential, load_model
@@ -21,6 +23,8 @@ import time
 import random
 # from tqdm import tqdm
 import os
+
+print("Dependencies Loaded...")
 
 print("tensorflow version: ", tf.__version__)
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU'))) 
@@ -114,6 +118,8 @@ print('shuffled files: ' ,len(original_files))
 files = original_files[0:DATA_FILE_SAMPLES]
 
 master_data = []
+
+print("Loading Files...")
 
 for file in files:
     print("file: ", file)
@@ -462,9 +468,12 @@ class DQNAgent:
 
 agent = DQNAgent()
 
+print("Iterate over EPISODES...")
+
+
 # Iterate over episodes
 #for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
-for episode in range(EPISODES+1):
+for episode in range(EPISODES):
     
     print(episode, " of ", EPISODES, " ",(episode/EPISODES) * 100, "% complete")
     
