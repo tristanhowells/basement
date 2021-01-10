@@ -19,6 +19,7 @@ import pickle
 from collections import deque
 import time
 import random
+# from tqdm import tqdm
 import os
 
 print("tensorflow version: ", tf.__version__)
