@@ -521,9 +521,9 @@ for episode in EPISODES:
         
         # Save model, but only when min reward is greater or equal a set value
         if min_reward >= MIN_REWARD:
-            agent.model.save(f'/artifacts/models/model_name)
+            agent.model.save(/artifacts/models/model_name)
         if episode%500 == 0:
-            agent.model.save(f'/artifacts/models/model_name)
+            agent.model.save(/artifacts/models/model_name)
     
     # Decay epsilon
     if epsilon > MIN_EPSILON:
