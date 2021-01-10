@@ -465,7 +465,9 @@ agent = DQNAgent()
 # Iterate over episodes
 #for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 for episode in EPISODES:
-
+    
+    print(episode, " of ", EPISODES, " ",(episode/EPISODE) * 100, "% complete")
+    
     # Update tensorboard step every episode
     agent.tensorboard.step = episode
 
