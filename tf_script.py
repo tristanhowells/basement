@@ -516,12 +516,14 @@ for episode in EPISODES:
         max_reward = max(ep_rewards[-AGGREGATE_STATS_EVERY:])
         #portfolio_value = 
         agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward, epsilon=epsilon)
-
+        
+        model_name = MODEL_NAME + "_max_reward:_" + str(max_reward) + "_average_reward:_" + str(average_reward) + "_min_reward:_" + str(min_reward) + str(int(time.time())) 
+        
         # Save model, but only when min reward is greater or equal a set value
         if min_reward >= MIN_REWARD:
-            agent.model.save(f'/artifacts/models/{MODEL_NAME}_{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min_{int(time.time())}.model')
+            agent.model.save(f'/artifacts/models/model_name)
         if episode%500 == 0:
-            agent.model.save(f'/artifacts/models/{MODEL_NAME}_{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min_{int(time.time())}.model')
+            agent.model.save(f'/artifacts/models/model_name)
     
     # Decay epsilon
     if epsilon > MIN_EPSILON:
