@@ -464,7 +464,7 @@ agent = DQNAgent()
 
 # Iterate over episodes
 #for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
-for episode in EPISODES:
+for episode in range(EPISODES+1):
     
     print(episode, " of ", EPISODES, " ",(episode/EPISODE) * 100, "% complete")
     
