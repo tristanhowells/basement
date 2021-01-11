@@ -464,7 +464,7 @@ agent = DQNAgent()
 
 # Iterate over episodes
 # for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
-for episode in range(EPISODES)
+for episode in range(EPISODES):
     print(episode, " of ", EPISODES)
 
     # Update tensorboard step every episode
