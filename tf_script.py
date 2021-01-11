@@ -5,8 +5,6 @@
 # pip install tqdm
 # pip install scikit-learn
 
-print("Script Accessed...")
-
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import Sequential, load_model
@@ -21,17 +19,15 @@ import pickle
 from collections import deque
 import time
 import random
-# from tqdm import tqdm
+#from tqdm import tqdm
 import os
-
-print("Dependencies Loaded...")
 
 print("tensorflow version: ", tf.__version__)
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU'))) 
 
 DISCOUNT = 0.99
-REPLAY_MEMORY_SIZE = 50000  # How many last steps to keep for model training (CHANGE BACK TO ~50_000)
-MIN_REPLAY_MEMORY_SIZE = 5000  # Minimum number of steps in a memory to start training
+REPLAY_MEMORY_SIZE = 50_000  # How many last steps to keep for model training (CHANGE BACK TO ~50_000)
+MIN_REPLAY_MEMORY_SIZE = 5_000  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 32  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
 MODEL_NAME = '256_512_512_256'
@@ -53,7 +49,8 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 
-DATA_FILE_SAMPLES = 2 
+DATA_FILE_SAMPLES = 5
+# EPISODES = 1001
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -117,8 +114,6 @@ print('shuffled files: ' ,len(original_files))
 files = original_files[0:DATA_FILE_SAMPLES]
 
 master_data = []
-
-print("Loading Files...")
 
 for file in files:
     print("file: ", file)
@@ -298,8 +293,8 @@ tf.random.set_seed(1)
 #backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
 # Create models folder
-if not os.path.isdir('model'):
-    os.makedirs('model')
+if not os.path.isdir('models'):
+    os.makedirs('models')
 
 # Own Tensorboard class
 class ModifiedTensorBoard(TensorBoard):
@@ -364,7 +359,7 @@ class DQNAgent:
         self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
        
         #Custom TensorBoard object
-        self.tensorboard = ModifiedTensorBoard(log_dir="artifacts/logs/{}-{}".format(MODEL_NAME, int(time.time())))
+        self.tensorboard = ModifiedTensorBoard(log_dir="logs/{}-{}".format(MODEL_NAME, int(time.time())))
        
         #Uesd to count when time to update target model with main model weights
         self.target_update_counter = 0
@@ -405,16 +400,16 @@ class DQNAgent:
             return
 
         # Get a minibatch of random samples from memory replay table
-        # else:
-        minibatch = random.sample(self.replay_memory, MINIBATCH_SIZE)
-
-        if np.array([transition[0] for transition in minibatch]).shape == (32, 30, 5):
-            current_states = np.array([transition[0] for transition in minibatch])
         else:
-                
-           while np.array([transition[0] for transition in minibatch]).shape != (32, 30, 5):
-              minibatch = random.sample(self.replay_memory, MINIBATCH_SIZE)
-              current_states = np.array([transition[0] for transition in minibatch])      
+            minibatch = random.sample(self.replay_memory, MINIBATCH_SIZE)
+
+            if np.array([transition[0] for transition in minibatch]).shape == (32, 30, 5):
+                current_states = np.array([transition[0] for transition in minibatch])
+            else:
+                return
+#             while np.array([transition[0] for transition in minibatch]).shape != (32, 30, 5):
+#                 minibatch = random.sample(self.replay_memory, MINIBATCH_SIZE)
+#                 current_states = np.array([transition[0] for transition in minibatch])      
        
 
 
@@ -467,15 +462,11 @@ class DQNAgent:
 
 agent = DQNAgent()
 
-print("Iterate over EPISODES...")
-
-
 # Iterate over episodes
-#for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
-for episode in range(EPISODES):
-    
-    print(episode, " of ", EPISODES, " ",(episode/EPISODES) * 100, "% complete")
-    
+# for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
+for episode in range(EPISODES)
+    print(episode, " of ", EPISODES)
+
     # Update tensorboard step every episode
     agent.tensorboard.step = episode
 
@@ -526,14 +517,12 @@ for episode in range(EPISODES):
         max_reward = max(ep_rewards[-AGGREGATE_STATS_EVERY:])
         #portfolio_value = 
         agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward, epsilon=epsilon)
-        
-        model_name = MODEL_NAME + "_max_reward:_" + str(max_reward) + "_average_reward:_" + str(average_reward) + "_min_reward:_" + str(min_reward) + str(int(time.time())) 
-        
+
         # Save model, but only when min reward is greater or equal a set value
         if min_reward >= MIN_REWARD:
-            agent.model.save('/artifacts/models/model_name')
+            agent.model.save(f'models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
         if episode%500 == 0:
-            agent.model.save('/artifacts/models/model_name')
+            agent.model.save(f'models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
     
     # Decay epsilon
     if epsilon > MIN_EPSILON:
