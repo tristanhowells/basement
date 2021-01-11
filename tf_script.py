@@ -298,8 +298,8 @@ tf.random.set_seed(1)
 #backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
 # Create models folder
-if not os.path.isdir('models'):
-    os.makedirs('models')
+if not os.path.isdir('model'):
+    os.makedirs('model')
 
 # Own Tensorboard class
 class ModifiedTensorBoard(TensorBoard):
