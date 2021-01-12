@@ -7,10 +7,10 @@
 
 import numpy as np
 import pandas as pd
-from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Activation, Flatten
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import TensorBoard
+from tensorflow.models import Sequential, load_model
+from tensorflow.layers import Dense, Dropout, Conv2D, MaxPooling2D, Activation, Flatten
+from tensorflow.optimizers import Adam
+from tensorflow.callbacks import TensorBoard
 import tensorflow as tf
 from os import listdir
 from sklearn import preprocessing
