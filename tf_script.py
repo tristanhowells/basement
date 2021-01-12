@@ -516,13 +516,13 @@ for episode in range(EPISODES):
         #portfolio_value = 
         agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward, epsilon=epsilon)
 
-        file_name = 'models/' + MODEL_NAME + str(max_reward) + 'max_' + str(average_reward) + 'avg_' + str(min_reward) + str(int(time.time())) + '.model'
+        #file_name = 'models/' + MODEL_NAME + str(max_reward) + 'max_' + str(average_reward) + 'avg_' + str(min_reward) + str(int(time.time())) + '.model'
 
         # Save model, but only when min reward is greater or equal a set value
-        if min_reward >= MIN_REWARD:
-            agent.model.save(file_name)
-        if episode%500 == 0:
-            agent.model.save(file_name)
+        #if min_reward >= MIN_REWARD:
+        #    agent.model.save(file_name)
+        #if episode%500 == 0:
+        #    agent.model.save(file_name)
     
     # Decay epsilon
     if epsilon > MIN_EPSILON:
