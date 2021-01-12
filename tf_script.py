@@ -403,11 +403,11 @@ class DQNAgent:
         minibatch = random.sample(self.replay_memory, MINIBATCH_SIZE)
 
         if np.array([transition[0] for transition in minibatch]).shape == (32, 30, 5):
-            current_states = np.array([transition[0] for transition in minibatch])
+            current_states = np.array(np.array([transition[0]) for transition in minibatch])
         else:
             while np.array([transition[0] for transition in minibatch]).shape != (32, 30, 5):
                 minibatch = random.sample(self.replay_memory, MINIBATCH_SIZE)
-                current_states = np.array([transition[0] for transition in minibatch])      
+                current_states = np.array(np.array([transition[0]) for transition in minibatch])      
        
 
 
