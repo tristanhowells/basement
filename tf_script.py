@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+#13/01/2020
+
 # pip install pandas
 # pip install tqdm
 # pip install scikit-learn
@@ -8,7 +10,7 @@
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layer import Dense, Dropout, Conv2D, MaxPooling2D, Activation, Flatten
+from tensorflow.keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Activation, Flatten
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
 import tensorflow as tf
@@ -26,8 +28,8 @@ print("tensorflow version: ", tf.__version__)
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU'))) 
 
 DISCOUNT = 0.99
-REPLAY_MEMORY_SIZE = 50000  # How many last steps to keep for model training (CHANGE BACK TO ~50_000)
-MIN_REPLAY_MEMORY_SIZE = 5000  # Minimum number of steps in a memory to start training
+REPLAY_MEMORY_SIZE = 50_000  # How many last steps to keep for model training (CHANGE BACK TO ~50_000)
+MIN_REPLAY_MEMORY_SIZE = 5_000  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 32  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
 MODEL_NAME = '256_512_512_256'
@@ -408,8 +410,6 @@ class DQNAgent:
             while np.array([transition[0] for transition in minibatch]).shape != (32, 30, 5):
                 minibatch = random.sample(self.replay_memory, MINIBATCH_SIZE)
                 current_states = np.array([np.array(transition[0]) for transition in minibatch])      
-       
-
 
         # current_states = tf.convert_to_tensor(current_states, dtype=tf.float32)
         # print("current_states type: ", type(current_states))
@@ -462,7 +462,7 @@ agent = DQNAgent()
 
 # Iterate over episodes
 # for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
-for episode in range(EPISODES):
+for episode in range(EPISODES)
     print(episode, " of ", EPISODES)
 
     # Update tensorboard step every episode
@@ -516,18 +516,13 @@ for episode in range(EPISODES):
         #portfolio_value = 
         agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward, epsilon=epsilon)
 
-        #file_name = 'models/' + MODEL_NAME + str(max_reward) + 'max_' + str(average_reward) + 'avg_' + str(min_reward) + str(int(time.time())) + '.model'
-
         # Save model, but only when min reward is greater or equal a set value
-        #if min_reward >= MIN_REWARD:
-        #    agent.model.save(file_name)
-        #if episode%500 == 0:
-        #    agent.model.save(file_name)
+        if min_reward >= MIN_REWARD:
+            agent.model.save(f'models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
+        if episode%500 == 0:
+            agent.model.save(f'models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
     
     # Decay epsilon
     if epsilon > MIN_EPSILON:
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
-
-
-
