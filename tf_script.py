@@ -26,8 +26,8 @@ print("tensorflow version: ", tf.__version__)
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU'))) 
 
 DISCOUNT = 0.99
-REPLAY_MEMORY_SIZE = 50_000  # How many last steps to keep for model training (CHANGE BACK TO ~50_000)
-MIN_REPLAY_MEMORY_SIZE = 5_000  # Minimum number of steps in a memory to start training
+REPLAY_MEMORY_SIZE = 50000  # How many last steps to keep for model training (CHANGE BACK TO ~50_000)
+MIN_REPLAY_MEMORY_SIZE = 5000  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 32  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
 MODEL_NAME = '256_512_512_256'
