@@ -463,7 +463,8 @@ agent = DQNAgent()
 # Iterate over episodes
 # for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 for episode in range(EPISODES):
-    print(episode, " of ", EPISODES, " complete...")
+    
+    start_time = time.time()
 
     # Update tensorboard step every episode
     agent.tensorboard.step = episode
@@ -526,3 +527,7 @@ for episode in range(EPISODES):
     if epsilon > MIN_EPSILON:
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
+
+    end_time = time.time()
+    print(episode, " of ", EPISODES, " complete...", (end_time - start_time))
+
