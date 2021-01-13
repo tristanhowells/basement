@@ -295,8 +295,8 @@ tf.random.set_seed(1)
 #backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
 # Create models folder
-if not os.path.isdir('models'):
-    os.makedirs('models')
+if not os.path.isdir('/storage/models'):
+    os.makedirs('/storage/models')
 
 # Own Tensorboard class
 class ModifiedTensorBoard(TensorBoard):
@@ -338,8 +338,8 @@ class ModifiedTensorBoard(TensorBoard):
             self.step += 1
             self.writer.flush()
 
-    _train_dir = os.path.dirname(os.path.realpath('models'))
-    _log_write_dir = os.path.dirname(os.path.realpath('models'))
+    _train_dir = os.path.dirname(os.path.realpath('/storage/models'))
+    _log_write_dir = os.path.dirname(os.path.realpath('/storage/models'))
     _should_write_train_graph = False
 
     def _train_step(self):
@@ -361,7 +361,7 @@ class DQNAgent:
         self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
        
         #Custom TensorBoard object
-        self.tensorboard = ModifiedTensorBoard(log_dir="logs/{}-{}".format(MODEL_NAME, int(time.time())))
+        self.tensorboard = ModifiedTensorBoard(log_dir="/storage/logs/{}-{}".format(MODEL_NAME, int(time.time())))
        
         #Uesd to count when time to update target model with main model weights
         self.target_update_counter = 0
@@ -519,9 +519,9 @@ for episode in range(EPISODES):
 
         # Save model, but only when min reward is greater or equal a set value
         if min_reward >= MIN_REWARD:
-            agent.model.save(f'models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
+            agent.model.save(f'/storage/models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
         if episode%500 == 0:
-            agent.model.save(f'models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
+            agent.model.save(f'/storage/models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
     
     # Decay epsilon
     if epsilon > MIN_EPSILON:
