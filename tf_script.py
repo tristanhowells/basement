@@ -118,7 +118,7 @@ print('shuffled files: ' ,len(original_files))
 files = original_files[0:DATA_FILE_SAMPLES]
 
 #save files list used in this training run for reference
-files_path = '/artifacts'
+files_path = r'/artifacts'
 
 with open(files_path, "w") as output:
     writer = csv.writer(output)
