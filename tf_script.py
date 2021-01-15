@@ -71,7 +71,7 @@ def episode_window(data):
     episode_data_window = EPISODE_STEPS + OBSERVATION_WINDOW
     windows = []
 
-    for e in range(len(data)-episode_data_window):
+    for e in range(random.randint(0,30), len(data)-episode_data_window, episode_data_window):
         #returns a list of observation_windows
         window_start = e
         window_end = e + episode_data_window
