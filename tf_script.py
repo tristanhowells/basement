@@ -369,7 +369,7 @@ class DQNAgent:
     def create_model(self):
         
 #         try:
-        model = tf.keras.models.load_model(r'storage/models/256_512_512_256_____2.53max_-106.63avg_-184.02min__1610647079.model')
+        model = tf.keras.models.load_model(r'/storage/models/256_512_512_256_____2.53max_-106.63avg_-184.02min__1610647079.model')
         print("model = storage/models/256_512_512_256_____2.53max_-106.63avg_-184.02min__1610647079.model")
 #         else:
 #             model = Sequential()
