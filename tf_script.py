@@ -51,7 +51,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 
-DATA_FILE_SAMPLES = 5
+DATA_FILE_SAMPLES = 50
 # EPISODES = 1001
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
@@ -71,7 +71,7 @@ def episode_window(data):
     episode_data_window = EPISODE_STEPS + OBSERVATION_WINDOW
     windows = []
 
-    for e in range(random.randint(0,30), len(data)-episode_data_window, episode_data_window):
+    for e in range(random.randint(0,30), len(data)-episode_data_window, random.randint(1,50)):
         #returns a list of observation_windows
         window_start = e
         window_end = e + episode_data_window
@@ -105,7 +105,8 @@ def observation_window(window):
 
 # for paperspace instance
 path = r'/storage/data/'
-# path = r'C:\Users\trist\OneDrive\Documents\python\asx_data'
+# path = r'C:\Users\Tristan\Desktop\github_asx_training_repo\asx_data'
+
 
 files = find_csv_filenames(path)
 
@@ -117,8 +118,11 @@ files = original_files[0:DATA_FILE_SAMPLES]
 
 master_data = []
 
+file_counter = 0
+
 for file in files:
-    print("file: ", file)
+#     print("file: ", file)
+    file_counter += 1
     file_path = os.path.join(path, file)
     DATA = pd.read_csv(file_path)
     DATA.dropna(inplace=True)
@@ -135,8 +139,10 @@ for file in files:
         counter += 1
         cob = observation_window(data[i])
         all_data.append(cob)
-
+    print(file_counter, "/", DATA_FILE_SAMPLES, " file: ", file, len(all_data), "windows")
+        
     master_data.extend(all_data)
+    
 
 shuffled_data = shuffle(master_data, random_state=0)
 
@@ -148,6 +154,7 @@ print("Shuffled Data Len: ", len(shuffled_data))
 EPISODES = len(shuffled_data)
 
 print("Number of Episodes: ", EPISODES)
+
 
 
 class Trader:
