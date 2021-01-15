@@ -23,6 +23,7 @@ import time
 import random
 #from tqdm import tqdm
 import os
+import csv
 
 print("tensorflow version: ", tf.__version__)
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU'))) 
@@ -115,6 +116,13 @@ print("number of samples: " , len(files))
 original_files = shuffle(files)
 print('shuffled files: ' ,len(original_files))
 files = original_files[0:DATA_FILE_SAMPLES]
+
+#save files list used in this training run for reference
+files_path = '/artifacts'
+
+with open(files_path, "w") as output:
+    writer = csv.writer(output)
+    writer.writerow([files])
 
 master_data = []
 
