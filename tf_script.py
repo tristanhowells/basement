@@ -117,12 +117,12 @@ original_files = shuffle(files)
 print('shuffled files: ' ,len(original_files))
 files = original_files[0:DATA_FILE_SAMPLES]
 
-#save files list used in this training run for reference
-files_path = r'/artifacts'
+# #save files list used in this training run for reference
+# files_path = r'/artifacts'
 
-with open(files_path, "w") as output:
-    writer = csv.writer(output)
-    writer.writerow([files])
+# with open(files_path, "w") as output:
+#     writer = csv.writer(output)
+#     writer.writerow([files])
 
 master_data = []
 
