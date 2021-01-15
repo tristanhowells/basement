@@ -367,26 +367,31 @@ class DQNAgent:
         self.target_update_counter = 0
        
     def create_model(self):
-        # model = tf.keras.models.load_model(r'C:\Users\trist\Downloads\models\2x256__-106.57max_-128.78avg_-142.80min__1609587151.model')
-        model = Sequential()
-        model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
-        model.add(Activation('relu'))
-        model.add(Flatten())
         
-        model.add(Dense(256))
-        model.add(Activation('relu'))
-        model.add(Dropout(.2))
+#         try:
+        model = tf.keras.models.load_model(r'storage/models/256_512_512_256_____2.53max_-106.63avg_-184.02min__1610647079.model')
+        print("model = storage/models/256_512_512_256_____2.53max_-106.63avg_-184.02min__1610647079.model")
+#         else:
+#             model = Sequential()
+#             model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
+#             model.add(Activation('relu'))
+#             model.add(Flatten())
 
-        model.add(Dense(512))
-        model.add(Activation('relu'))
-        model.add(Dropout(.2))
+#             model.add(Dense(256))
+#             model.add(Activation('relu'))
+#             model.add(Dropout(.2))
 
-        model.add(Dense(256))
-        model.add(Activation('relu'))
-        model.add(Dropout(.2))
-       
-        model.add(Dense(env.ACTION_SPACE_SIZE, activation='linear')) #ACTION_SPACE_SIZE = how many choice (3)
-        model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
+#             model.add(Dense(512))
+#             model.add(Activation('relu'))
+#             model.add(Dropout(.2))
+
+#             model.add(Dense(256))
+#             model.add(Activation('relu'))
+#             model.add(Dropout(.2))
+
+#             model.add(Dense(env.ACTION_SPACE_SIZE, activation='linear')) #ACTION_SPACE_SIZE = how many choice (3)
+#             model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
+#             print("model = scratch")
         return model
 
     #Adds step's data to a memory replay array
