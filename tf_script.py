@@ -118,7 +118,7 @@ print('shuffled files: ' ,len(original_files))
 files = original_files[0:DATA_FILE_SAMPLES]
 
 # #save files list used in this training run for reference
-files_path = r'/artifacts'
+files_path = r'/artifacts/files.csv'
 files_df = pd.DataFrame(files)
 files_df.to_csv(files_path, header=None, index_label=None)
 
