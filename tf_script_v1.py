@@ -290,6 +290,7 @@ env = MarketEnv()
 
 # For stats
 ep_rewards = [-200]
+portfolio_value_list = [0]
 
 # For more repetitive results
 random.seed(1)
@@ -521,7 +522,8 @@ for episode in range(EPISODES):
         step += 1      
 
         if step >= 199:
-          print(env.portfolio_value)
+            print(env.portfolio_value)
+            portfolio_value_list.append(portfolio_value)
         
         if episode == 1:
            print(env.portfolio_value)
@@ -532,8 +534,14 @@ for episode in range(EPISODES):
         average_reward = sum(ep_rewards[-AGGREGATE_STATS_EVERY:])/len(ep_rewards[-AGGREGATE_STATS_EVERY:])
         min_reward = min(ep_rewards[-AGGREGATE_STATS_EVERY:])
         max_reward = max(ep_rewards[-AGGREGATE_STATS_EVERY:])
-        #portfolio_value = 
-        agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward, epsilon=epsilon)
+        
+        average_portfolio_value = sum(portfolio_value_list[-AGGREGATE_STATS_EVERY:])/len(portfolio_value_list[-AGGREGATE_STATS_EVERY:])
+        min_portfolio_value = min(portfolio_value_list[-AGGREGATE_STATS_EVERY:])
+        max_porfolio_value = max(portfolio_value_list[-AGGREGATE_STATS_EVERY:])
+        
+        agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward, epsilon=epsilon, 
+                                       average_portfolio_value=average_portfolio_value, min_portfolio_value=min_portfolio_value, 
+                                       max_portfolio_value=max_portfolio_value)
 
         # Save model, but only when min reward is greater or equal a set value
         if min_reward >= MIN_REWARD:
