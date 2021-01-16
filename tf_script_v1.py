@@ -284,7 +284,6 @@ class MarketEnv:
         
     def portfolio_value(self):
         portfolio_value = self.portfolio_value
-        portfolio_value = float(portfolio_value)
         
         
 env = MarketEnv()
@@ -523,8 +522,8 @@ for episode in range(EPISODES):
         step += 1      
 
         if step >= 199:
-            portfolio_value = env.portfolio_value
-            print(portfolio_value)
+            portfolio_value = float(env.portfolio_value)
+            print("portfolio_value", portfolio_value)
             portfolio_value_list.append(portfolio_value)
             print("portfolio_value type", type(portfolio_value), "portfolio_value_list type", type(portfolio_value_list))
             print("reward type", type(reward), "episode_reward type", type(episode_reward), "ep_reward type", type(ep_rewards))
