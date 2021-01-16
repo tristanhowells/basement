@@ -523,6 +523,9 @@ for episode in range(EPISODES):
         if step >= 199:
           print(env.portfolio_value)
         
+        if episode == 1:
+           print(env.portfolio_value)
+        
     # Append episode reward to a list and log stats (every given number of episodes)
     ep_rewards.append(episode_reward)
     if not episode % AGGREGATE_STATS_EVERY or episode == 1:
