@@ -374,7 +374,7 @@ class DQNAgent:
         self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
        
         #Custom TensorBoard object
-        self.tensorboard = ModifiedTensorBoard(log_dir="/storage/logs/{}-{}".format(MODEL_NAME, int(time.time())))
+        self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs/{}-{}".format(MODEL_NAME, int(time.time())))
        
         #Uesd to count when time to update target model with main model weights
         self.target_update_counter = 0
