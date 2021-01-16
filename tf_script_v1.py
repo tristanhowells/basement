@@ -540,7 +540,7 @@ for episode in range(EPISODES):
         
         average_portfolio_value = sum(portfolio_value_list[-AGGREGATE_STATS_EVERY:])/len(portfolio_value_list[-AGGREGATE_STATS_EVERY:])
         min_portfolio_value = min(portfolio_value_list[-AGGREGATE_STATS_EVERY:])
-        max_porfolio_value = max(portfolio_value_list[-AGGREGATE_STATS_EVERY:])
+        max_portfolio_value = max(portfolio_value_list[-AGGREGATE_STATS_EVERY:])
         
         agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward, epsilon=epsilon, 
                                        average_portfolio_value=average_portfolio_value, min_portfolio_value=min_portfolio_value, 
