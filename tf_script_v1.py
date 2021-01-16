@@ -260,7 +260,7 @@ class MarketEnv:
         self.episode_step = 0
         self.trader.current_value = 0
         self.trader.volume = 0
-        self.trader.kitty = 30000
+        self.trader.kitty = 3000
    
     def step(self, action, reward=-1):
         self.trader.action(action)
