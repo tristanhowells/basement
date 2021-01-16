@@ -455,7 +455,7 @@ class DQNAgent:
             y.append(current_qs)
 
         # Fit on all samples as one batch, log only on terminal state
-        self.model.fit(np.array(X), np.array(y), batch_size=MINIBATCH_SIZE, verbose=1, shuffle=False, callbacks=[self.tensorboard] if terminal_state else None)
+        self.model.fit(np.array(X), np.array(y), batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False, callbacks=[self.tensorboard] if terminal_state else None)
 
         # Update target network counter every episode
         if terminal_state:
