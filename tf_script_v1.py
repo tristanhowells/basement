@@ -522,7 +522,8 @@ for episode in range(EPISODES):
         step += 1      
 
         if step >= 199:
-            print(env.portfolio_value)
+            portfolio_value = env.portfolio_value
+            print(portfolio_value)
             portfolio_value_list.append(portfolio_value)
         
         if episode == 1:
