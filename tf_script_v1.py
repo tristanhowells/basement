@@ -254,6 +254,7 @@ class MarketEnv:
 
     def __init__(self):
         self.trader = Trader()
+        self.portfolio_value = 3000
 
     def reset(self):
         self.episode_step = 0
@@ -523,10 +524,9 @@ for episode in range(EPISODES):
 
         if step >= 199:
             portfolio_value = float(env.portfolio_value)
-            print("portfolio_value", portfolio_value)
             portfolio_value_list.append(portfolio_value)
-            print("portfolio_value type", type(portfolio_value), "portfolio_value_list type", type(portfolio_value_list))
-            print("reward type", type(reward), "episode_reward type", type(episode_reward), "ep_reward type", type(ep_rewards))
+#             print("portfolio_value type", type(portfolio_value), "portfolio_value_list type", type(portfolio_value_list))
+#             print("reward type", type(reward), "episode_reward type", type(episode_reward), "ep_reward type", type(ep_rewards))
 
         if episode == 1:
            print(env.portfolio_value)
