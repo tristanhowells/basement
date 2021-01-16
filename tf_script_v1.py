@@ -282,7 +282,7 @@ class MarketEnv:
         price = shuffled_data[episode-1][self.episode_step][1]
         return price
         
-    def portfolio_value(self)
+    def portfolio_value(self):
         portfolio_value = self.portfolio_value
         
         
