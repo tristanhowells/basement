@@ -527,9 +527,6 @@ for episode in range(EPISODES):
             portfolio_value_list.append(portfolio_value)
 #             print("portfolio_value type", type(portfolio_value), "portfolio_value_list type", type(portfolio_value_list))
 #             print("reward type", type(reward), "episode_reward type", type(episode_reward), "ep_reward type", type(ep_rewards))
-
-        if episode == 1:
-           print(env.portfolio_value)
         
     # Append episode reward to a list and log stats (every given number of episodes)
     ep_rewards.append(episode_reward)
@@ -558,5 +555,5 @@ for episode in range(EPISODES):
         epsilon = max(MIN_EPSILON, epsilon)
 
     end_time = time.time()
-    print(episode, " of ", EPISODES, " complete...", (end_time - start_time))
+    print(episode, " of ", EPISODES, " complete...", (end_time - start_time), "Portfolio Value: ", portfolio_value)
 
