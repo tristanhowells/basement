@@ -525,7 +525,9 @@ for episode in range(EPISODES):
             portfolio_value = env.portfolio_value
             print(portfolio_value)
             portfolio_value_list.append(portfolio_value)
-        
+            print("portfolio_value type", type(portfolio_value), "portfolio_value_list type", type(portfolio_value_list))
+            print("reward type", type(reward), "episode_reward type", type(episode_reward), "ep_reward type", type(ep_reward))
+
         if episode == 1:
            print(env.portfolio_value)
         
