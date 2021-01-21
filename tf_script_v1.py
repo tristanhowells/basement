@@ -555,7 +555,9 @@ for episode in range(EPISODES):
         epsilon = max(MIN_EPSILON, epsilon)
 
     end_time = time.time()
-#     print(episode, " of ", EPISODES, " complete...", (end_time - start_time), "Portfolio Value: ", portfolio_value)
+    
+    if episode%100 == 0:
+        print(episode, " of ", EPISODES, " complete...", (end_time - start_time), "Portfolio Value: ", portfolio_value)
 
     
 print("100% complete...")
