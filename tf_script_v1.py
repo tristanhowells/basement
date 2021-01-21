@@ -21,7 +21,7 @@ import pickle
 from collections import deque
 import time
 import random
-from tqdm import tqdm
+# from tqdm import tqdm
 import os
 import csv
 
@@ -475,8 +475,8 @@ class DQNAgent:
 agent = DQNAgent()
 
 # Iterate over episodes
-for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
-# for episode in range(EPISODES):
+# for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
+for episode in range(EPISODES):
     
     start_time = time.time()
 
