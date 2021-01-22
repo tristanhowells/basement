@@ -157,6 +157,9 @@ print("Shuffled Data Len: ", len(shuffled_data))
 
 EPISODES = len(shuffled_data)
 
+if EPISODES >= 5000:
+    EPISODES = 5000
+
 print("Number of Episodes: ", EPISODES)
 
 
