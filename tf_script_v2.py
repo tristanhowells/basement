@@ -18,6 +18,7 @@ import csv
 from datetime import date
 
 # Month abbreviation, day and year	
+today = date.today()
 today = str(today.strftime("%b-%d-%Y"))
 
 print("tensorflow version: ", tf.__version__)
