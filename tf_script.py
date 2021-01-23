@@ -158,6 +158,7 @@ shuffled_data = shuffle(master_data, random_state=0)
 print("Shuffled Data Len: ", len(shuffled_data))
 
 EPISODES = len(shuffled_data)
+EPISODES = 1001
 
 print("Number of Episodes: ", EPISODES)
 
