@@ -555,7 +555,7 @@ for episode in range(EPISODES):
     end_time = time.time()
     
     if episode%100 == 0:
-        print(episode, " of ", EPISODES, " complete...", (end_time - start_time), "Portfolio Value: ", portfolio_value)
+        print(episode+1, " of ", EPISODES, " complete...", (end_time - start_time), "Portfolio Value: ", portfolio_value)
 
     
 print("100% complete...")
