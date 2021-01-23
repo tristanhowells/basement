@@ -1,11 +1,4 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-#13/01/2020
-
-# pip install pandas
-# pip install tqdm
-# pip install scikit-learn
+#current working model
 
 import numpy as np
 import pandas as pd
@@ -17,23 +10,26 @@ import tensorflow as tf
 from os import listdir
 from sklearn import preprocessing
 from sklearn.utils import shuffle
-import pickle
 from collections import deque
 import time
 import random
-# from tqdm import tqdm
 import os
 import csv
+from datetime import date
+
+# Month abbreviation, day and year	
+today = str(today.strftime("%b-%d-%Y"))
 
 print("tensorflow version: ", tf.__version__)
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU'))) 
+print("Start Date: ", today) 
 
 DISCOUNT = 0.99
 REPLAY_MEMORY_SIZE = 50_000  # How many last steps to keep for model training (CHANGE BACK TO ~50_000)
 MIN_REPLAY_MEMORY_SIZE = 5_000  # Minimum number of steps in a memory to start training
-MINIBATCH_SIZE = 32  # How many steps (samples) to use for training
+MINIBATCH_SIZE = 64  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
-MODEL_NAME = '256_512_512_256'
+MODEL_NAME = '4_layer_dqn'
 MIN_REWARD = -100 # For model save
 MEMORY_FRACTION = 0.20
 OBSERVATION_WINDOW = 30
@@ -149,10 +145,6 @@ for file in files:
     
 
 shuffled_data = shuffle(master_data, random_state=0)
-
-# Environment settings
-# EPISODES = len(shuffled_data[0:EPISODES])
-
 print("Shuffled Data Len: ", len(shuffled_data))
 
 EPISODES = len(shuffled_data)
@@ -250,6 +242,7 @@ class Trader:
     def reward(self):
         return self.reward
 
+    
 class MarketEnv:
     TIME_STEP_PENALTY = -1 
     OBSERVATION_SPACE_VALUES = (OBSERVATION_WINDOW, 5)
@@ -299,7 +292,6 @@ portfolio_value_list = [0]
 # For more repetitive results
 random.seed(1)
 np.random.seed(1)
-#tf.set_random_seed(1)
 tf.random.set_seed(1)
 
 # Memory fraction, used mostly when trai8ning multiple agents
@@ -307,8 +299,8 @@ tf.random.set_seed(1)
 #backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
 # Create models folder
-if not os.path.isdir('/storage/models'):
-    os.makedirs('/storage/models')
+if not os.path.isdir('/artifacts/models' + today):
+    os.makedirs('/artifacts/models' + today)
 
 # Own Tensorboard class
 class ModifiedTensorBoard(TensorBoard):
@@ -317,7 +309,6 @@ class ModifiedTensorBoard(TensorBoard):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.step = 1
-       # self.writer = tf.summary.FileWriter(self.log_dir)
         self.writer = tf.summary.create_file_writer(self.log_dir)
 
     # Overriding this method to stop creating default log writer
@@ -350,9 +341,9 @@ class ModifiedTensorBoard(TensorBoard):
             self.step += 1
             self.writer.flush()
 
-    _train_dir = os.path.dirname(os.path.realpath('/storage/models'))
-    _log_write_dir = os.path.dirname(os.path.realpath('/storage/models'))
-    _should_write_train_graph = False
+    _train_dir = os.path.dirname(os.path.realpath('/artifacts/models' + today))
+    _log_write_dir = os.path.dirname(os.path.realpath('/artifacts/models' + today))
+    _should_write_train_graph = os.path.dirname(os.path.realpath('/artifacts/models' + today))
 
     def _train_step(self):
         pass
@@ -373,7 +364,7 @@ class DQNAgent:
         self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
        
         #Custom TensorBoard object
-        self.tensorboard = ModifiedTensorBoard(log_dir="/storage/logs/{}-{}".format(MODEL_NAME, int(time.time())))
+        self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
        
         #Uesd to count when time to update target model with main model weights
         self.target_update_counter = 0
@@ -548,12 +539,12 @@ for episode in range(EPISODES):
 
         # Save model, but only when min reward is greater or equal a set value
         if min_reward >= MIN_REWARD:
-            agent.model.save(f'/storage/models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-            model_tag = f'/storage/models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
+            agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
+            model_tag = f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
             print(model_tag)
         if episode%500 == 0:
-            agent.model.save(f'/storage/models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-            model_tag = f'/storage/models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
+            agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
+            model_tag = f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
             print(model_tag)
     
     # Decay epsilon
