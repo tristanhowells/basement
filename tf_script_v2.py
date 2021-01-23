@@ -350,8 +350,8 @@ class ModifiedTensorBoard(TensorBoard):
             self.step += 1
             self.writer.flush()
 
-    _train_dir = os.path.dirname(os.path.realpath('/artifacts/models'))
-    _log_write_dir = os.path.dirname(os.path.realpath('/artifacts/models'))
+    _train_dir = os.path.dirname(os.path.realpath('/storage/models'))
+    _log_write_dir = os.path.dirname(os.path.realpath('/storage/models'))
     _should_write_train_graph = False
 
     def _train_step(self):
