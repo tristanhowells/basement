@@ -141,7 +141,7 @@ for file in files:
 
     all_data = []
     counter = 0
-    for i in range(len(data)):
+    for i in range(1001):
         counter += 1
         cob = observation_window(data[i])
         all_data.append(cob)
@@ -158,7 +158,6 @@ shuffled_data = shuffle(master_data, random_state=0)
 print("Shuffled Data Len: ", len(shuffled_data))
 
 EPISODES = len(shuffled_data)
-EPISODES = 1001
 
 print("Number of Episodes: ", EPISODES)
 
