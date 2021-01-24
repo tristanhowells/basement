@@ -383,6 +383,7 @@ class DQNAgent:
         
         try:
             model = tf.keras.models.load_model(r'/storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model')
+            print(model.summary())
             print("model = storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model")
         except:
             model = Sequential()
