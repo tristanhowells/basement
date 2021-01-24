@@ -389,7 +389,7 @@ class DQNAgent:
        
     def create_model(self):
         
-        if model in local():
+        if model in locals():
             model = model
         else:
             model = Sequential()
