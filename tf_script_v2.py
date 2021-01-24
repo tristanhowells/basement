@@ -110,8 +110,8 @@ files = find_csv_filenames(path)
 print("number of samples: " , len(files))
 
 original_files = shuffle(files)
-print('shuffled files: ' ,len(original_files))
-files = original_files[0:DATA_FILE_SAMPLES]
+print('shuffled files: ' , len(original_files))
+files = original_files
 
 # #save files list used in this training run for reference
 files_path = r'/artifacts/files.csv'
@@ -122,7 +122,7 @@ master_data = []
 
 file_counter = 0
 
-while len(master_data) <= 5000:
+if len(master_data) <= 1000:
     for file in files:
         file_counter += 1
         file_path = os.path.join(path, file)
@@ -150,9 +150,6 @@ shuffled_data = shuffle(master_data, random_state=0)
 print("Shuffled Data Len: ", len(shuffled_data))
 
 EPISODES = len(shuffled_data)
-
-if EPISODES >= 5000:
-    EPISODES = 5000
 
 print("Number of Episodes: ", EPISODES)
 
