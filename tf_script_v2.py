@@ -47,6 +47,14 @@ FEE = 20
 #  Stats settings
 AGGREGATE_STATS_EVERY = 50  # episodes
 
+###LOAD EXISTING MODEL
+try:
+    model = tf.keras.models.load_model(r'/storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model')
+    print(model.summary())
+    print("model = storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model")
+except:
+    print("...create new model...")
+
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
 DATA_SAMPLES = 500
@@ -381,11 +389,9 @@ class DQNAgent:
        
     def create_model(self):
         
-        try:
-            model = tf.keras.models.load_model(r'/storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model')
-            print(model.summary())
-            print("model = storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model")
-        except:
+        if model in local():
+            model = model
+        else:
             model = Sequential()
             model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
             model.add(Activation('relu'))
