@@ -122,7 +122,7 @@ master_data = []
 
 file_counter = 0
 
-if len(master_data) <= 1000:
+while len(master_data) <= 1000:
     for file in files:
         file_counter += 1
         file_path = os.path.join(path, file)
