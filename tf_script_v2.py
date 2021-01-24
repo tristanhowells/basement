@@ -384,7 +384,7 @@ class DQNAgent:
         try:
             model = tf.keras.models.load_model(r'/storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model')
             print("model = storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model")
-        else:
+        except:
             model = Sequential()
             model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
             model.add(Activation('relu'))
