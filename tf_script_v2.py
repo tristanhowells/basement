@@ -49,7 +49,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 
-DATA_FILE_SAMPLES = 50
+DATA_FILE_SAMPLES = 500
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -122,27 +122,28 @@ master_data = []
 
 file_counter = 0
 
-for file in files:
-    file_counter += 1
-    file_path = os.path.join(path, file)
-    DATA = pd.read_csv(file_path)
-    DATA.dropna(inplace=True)
-    DATA.drop(['Date','Adj Close'], axis=1, inplace=True)
-    DATA.astype('float')
-    
-    scaler = preprocessing.StandardScaler().fit(DATA)
-    
-    data = episode_window(DATA)
+while len(master_data) <= 5000:
+    for file in files:
+        file_counter += 1
+        file_path = os.path.join(path, file)
+        DATA = pd.read_csv(file_path)
+        DATA.dropna(inplace=True)
+        DATA.drop(['Date','Adj Close'], axis=1, inplace=True)
+        DATA.astype('float')
 
-    all_data = []
-    counter = 0
-    for i in range(len(data)):
-        counter += 1
-        cob = observation_window(data[i])
-        all_data.append(cob)
-    print(file_counter, "/", DATA_FILE_SAMPLES, " file: ", file, len(all_data), "windows")
-        
-    master_data.extend(all_data)
+        scaler = preprocessing.StandardScaler().fit(DATA)
+
+        data = episode_window(DATA)
+
+        all_data = []
+        counter = 0
+        for i in range(len(data)):
+            counter += 1
+            cob = observation_window(data[i])
+            all_data.append(cob)
+        print(file_counter, "/", DATA_FILE_SAMPLES, " file: ", file, len(all_data), "windows")
+
+        master_data.extend(all_data)
     
 
 shuffled_data = shuffle(master_data, random_state=0)
@@ -543,7 +544,7 @@ for episode in range(EPISODES):
             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
             model_tag = f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
             print(model_tag)
-        if episode%500 == 0:
+        if episode%1000 == 0:
             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
             model_tag = f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
             print(model_tag)
