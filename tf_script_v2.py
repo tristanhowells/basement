@@ -382,36 +382,31 @@ class DQNAgent:
     def create_model(self):
         
         ###LOAD EXISTING MODEL
-        try:
-            model = tf.keras.models.load_model(r'/storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model')
-            print(model.summary())
-            print("model = storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model")
-        except:
-            print("...create new model...")
-        
-        if model in locals():
-            model = model
-        else:
-            model = Sequential()
-            model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
-            model.add(Activation('relu'))
-            model.add(Flatten())
+        model = tf.keras.models.load_model(r'/storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model')
+        print(model.summary())
+        print("model = storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model")
 
-            model.add(Dense(256))
-            model.add(Activation('relu'))
-            model.add(Dropout(.2))
+        ###CREATE NEW MODEL
+#         model = Sequential()
+#         model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
+#         model.add(Activation('relu'))
+#         model.add(Flatten())
 
-            model.add(Dense(512))
-            model.add(Activation('relu'))
-            model.add(Dropout(.2))
+#         model.add(Dense(256))
+#         model.add(Activation('relu'))
+#         model.add(Dropout(.2))
 
-            model.add(Dense(256))
-            model.add(Activation('relu'))
-            model.add(Dropout(.2))
+#         model.add(Dense(512))
+#         model.add(Activation('relu'))
+#         model.add(Dropout(.2))
 
-            model.add(Dense(env.ACTION_SPACE_SIZE, activation='linear')) #ACTION_SPACE_SIZE = how many choice (3)
-            model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
-            print("model = scratch")
+#         model.add(Dense(256))
+#         model.add(Activation('relu'))
+#         model.add(Dropout(.2))
+
+#         model.add(Dense(env.ACTION_SPACE_SIZE, activation='linear')) #ACTION_SPACE_SIZE = how many choice (3)
+#         model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
+#         print("model = scratch")
         return model
 
     #Adds step's data to a memory replay array
