@@ -1,4 +1,4 @@
-#current working model
+#current stable model
 
 import numpy as np
 import pandas as pd
@@ -49,7 +49,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 
-DATA_FILE_SAMPLES = 500
+DATA_SAMPLES = 500
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -77,7 +77,7 @@ def episode_window(data):
 
     return windows
 
-def observation_window(window):
+def observation_window(window, scaler):
     #returns a list of tuple of (observation_window and current_price)
     observation_windows = [] 
     
@@ -102,7 +102,7 @@ def observation_window(window):
 
 # for paperspace instance
 path = r'/storage/data/'
-# path = r'C:\Users\Tristan\Desktop\github_asx_training_repo\asx_data'
+# path = r'H:\asx_data\training_dqn\data'
 
 
 files = find_csv_filenames(path)
@@ -113,16 +113,15 @@ original_files = shuffle(files)
 print('shuffled files: ' , len(original_files))
 files = original_files
 
-# #save files list used in this training run for reference
+#save files list used in this training run for reference
 files_path = r'/artifacts/files.csv'
 files_df = pd.DataFrame(files)
 files_df.to_csv(files_path, header=None, index_label=None)
 
-master_data = []
-
-file_counter = 0
-
-while len(master_data) <= 1000:
+def episode_builder(number_of_episodes): 
+    master_data = []
+    file_counter = 0
+    
     for file in files:
         file_counter += 1
         file_path = os.path.join(path, file)
@@ -139,20 +138,32 @@ while len(master_data) <= 1000:
         counter = 0
         for i in range(len(data)):
             counter += 1
-            cob = observation_window(data[i])
+            cob = observation_window(window=data[i], scaler=scaler)
             all_data.append(cob)
-        print(file_counter, "/", DATA_FILE_SAMPLES, " file: ", file, len(all_data), "windows")
+        print(file_counter, "/", len(original_files), " file: ", file, len(all_data), "windows")
 
         master_data.extend(all_data)
+        print("Number of Episodes: ", len(master_data))
+
+        if len(master_data) >= number_of_episodes:
+            shuffled_data = shuffle(master_data, random_state=0)
+            print("Shuffled Data Len: ", len(shuffled_data))
+
+            EPISODES = len(shuffled_data)
+
+            print("Number of Episodes: ", EPISODES)
+        
+            return shuffled_data, EPISODES
     
+    return shuffled_data, EPISODES
+            
 
-shuffled_data = shuffle(master_data, random_state=0)
-print("Shuffled Data Len: ", len(shuffled_data))
+shuffled_data, EPISODES = episode_builder(DATA_SAMPLES)
 
-EPISODES = len(shuffled_data)
+EPISODES = DATA_SAMPLES
+shuffled_data = shuffled_data[0:EPISODES]
 
-print("Number of Episodes: ", EPISODES)
-
+print("data sample size: ", len(shuffled_data))
 
 class Trader:
     
@@ -370,30 +381,30 @@ class DQNAgent:
        
     def create_model(self):
         
-#         try:
-#         model = tf.keras.models.load_model(r'/storage/models/256_512_512_256_____2.53max_-106.63avg_-184.02min__1610647079.model')
-#         print("model = storage/models/256_512_512_256_____2.53max_-106.63avg_-184.02min__1610647079.model")
-#         else:
-        model = Sequential()
-        model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
-        model.add(Activation('relu'))
-        model.add(Flatten())
+        try:
+            model = tf.keras.models.load_model(r'/storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model')
+            print("model = storage/256_512_512_256__-109.33max_-139.68avg_-159.90min__1611397335.model")
+        else:
+            model = Sequential()
+            model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
+            model.add(Activation('relu'))
+            model.add(Flatten())
 
-        model.add(Dense(256))
-        model.add(Activation('relu'))
-        model.add(Dropout(.2))
+            model.add(Dense(256))
+            model.add(Activation('relu'))
+            model.add(Dropout(.2))
 
-        model.add(Dense(512))
-        model.add(Activation('relu'))
-        model.add(Dropout(.2))
+            model.add(Dense(512))
+            model.add(Activation('relu'))
+            model.add(Dropout(.2))
 
-        model.add(Dense(256))
-        model.add(Activation('relu'))
-        model.add(Dropout(.2))
+            model.add(Dense(256))
+            model.add(Activation('relu'))
+            model.add(Dropout(.2))
 
-        model.add(Dense(env.ACTION_SPACE_SIZE, activation='linear')) #ACTION_SPACE_SIZE = how many choice (3)
-        model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
-        print("model = scratch")
+            model.add(Dense(env.ACTION_SPACE_SIZE, activation='linear')) #ACTION_SPACE_SIZE = how many choice (3)
+            model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
+            print("model = scratch")
         return model
 
     #Adds step's data to a memory replay array
