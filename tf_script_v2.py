@@ -386,9 +386,9 @@ class DQNAgent:
     def create_model(self):
         
         if LOAD_MODEL is not None:
-            print(f'Loading {LOAD_MODEL})
+            print(f'Loading {LOAD_MODEL}')
             model = load_model(LOAD_MODEL)
-            print(f'Model {LOAD_MODEL} loaded!)
+            print(f'Model {LOAD_MODEL} loaded!')
         else:
             ##CREATE NEW MODEL
             model = Sequential()
