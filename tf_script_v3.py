@@ -169,6 +169,7 @@ shuffled_data = shuffled_data[0:EPISODES]
 
 print("data sample size: ", len(shuffled_data))
 
+
 class Trader:
     
     def __init__ (self):
@@ -179,6 +180,9 @@ class Trader:
         self.current_value = 0 
         self.purchase_price = 0 
         self.reward = 0
+        self.buy = 0
+        self.hold = 0
+        self.sell = 0
         
     def action(self, choice): 
         '''
@@ -191,6 +195,7 @@ class Trader:
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
                 self.kitty = self.kitty
+                self.buy += 1
 
             else:
                 #calculate number of shares to buy
@@ -205,6 +210,7 @@ class Trader:
                 #reduce available kitty after purchase
                 self.kitty = self.kitty - (self.fee + self.current_value)
                 self.reward = -1
+                self.buy += 1
         
         if choice == 1:
             #hold position
@@ -214,13 +220,15 @@ class Trader:
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
                 self.kitty = self.kitty
+                self.hold += 1
             else:
                 self.purchase_price = self.purchase_price
                 self.volume = self.volume 
                 self.kitty = self.kitty
                 self.current_value = self.volume * env.price()
                 self.reward = (self.current_value - self.purchase_price) / self.purchase_price
-                   
+                self.hold += 1
+                
         if choice == 2:
             if self.volume <= 0: #if there is volume to sell, pass 
                 self.reward = -1
@@ -228,6 +236,7 @@ class Trader:
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
                 self.kitty = self.kitty
+                self.sell += 1
             else: #if there is money in the kitty, continue with trade (sell all of the available position)
                 #calculate the estimated value of the kitty after trade
                 self.sale_value = self.volume * env.price()
@@ -243,7 +252,8 @@ class Trader:
                 
                 #reset volume to 0
                 self.volume = 0 
-            
+                self.sell += 1
+                
     def current_value(self, current_value):
     	return self.current_value 
 
@@ -255,6 +265,9 @@ class Trader:
 
     def reward(self):
         return self.reward
+    
+    def choice_tracker(self):
+        return self.buy, self.hold, self.sell
 
     
 class MarketEnv:
@@ -271,7 +284,10 @@ class MarketEnv:
         self.trader.current_value = 0
         self.trader.volume = 0
         self.trader.kitty = 3000
-   
+        self.trader.buy = 0
+        self.trader.hold = 0
+        self.trader.sell = 0
+        
     def step(self, action, reward=-1):
         self.trader.action(action)
         
@@ -295,13 +311,18 @@ class MarketEnv:
         
     def portfolio_value(self):
         portfolio_value = self.portfolio_value
-        
+    
+    def choice_tracker(self):
+        return self.trader.buy, self.trader.hold, self.trader.sell
         
 env = MarketEnv()
 
 # For stats
 ep_rewards = [-200]
 portfolio_value_list = [0]
+buy_choice_list = []
+hold_choice_list = []
+sell_choice_list = []
 
 # For more repetitive results
 random.seed(1)
@@ -315,6 +336,9 @@ tf.random.set_seed(1)
 # Create models folder
 if not os.path.isdir('/artifacts/models' + today):
     os.makedirs('/artifacts/models' + today)
+
+# if not os.path.isdir('/storage/models' + today):
+#     os.makedirs('/storage/models' + today)
 
 class ModifiedTensorBoard(TensorBoard):
 
@@ -482,9 +506,7 @@ class DQNAgent:
 
 agent = DQNAgent()
 
-
 # Iterate over episodes
-# for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 for episode in range(EPISODES):
     
     start_time = time.time()
@@ -521,9 +543,6 @@ for episode in range(EPISODES):
         # Transform new continous state to new discrete state and count reward
         episode_reward += reward
 
-        #if SHOW_PREVIEW and not episode % AGGREGATE_STATS_EVERY:
-#             env.render()
-
         # Every step we update replay memory and train main network
         agent.update_replay_memory((current_state, action, reward, new_state, done))
         agent.train(done, step)
@@ -534,8 +553,14 @@ for episode in range(EPISODES):
         if step >= 199:
             portfolio_value = float(env.portfolio_value)
             portfolio_value_list.append(portfolio_value)
+            buy, hold, sell = env.choice_tracker()
+            buy_choice_list.append(buy)
+            hold_choice_list.append(hold)
+            sell_choice_list.append(sell)
+            
 #             print("portfolio_value type", type(portfolio_value), "portfolio_value_list type", type(portfolio_value_list))
 #             print("reward type", type(reward), "episode_reward type", type(episode_reward), "ep_reward type", type(ep_rewards))
+#             print(env.choice_tracker())
         
     # Append episode reward to a list and log stats (every given number of episodes)
     ep_rewards.append(episode_reward)
@@ -548,9 +573,23 @@ for episode in range(EPISODES):
         min_portfolio_value = min(portfolio_value_list[-AGGREGATE_STATS_EVERY:])
         max_portfolio_value = max(portfolio_value_list[-AGGREGATE_STATS_EVERY:])
         
+        average_buy_choices = sum(buy_choice_list[-AGGREGATE_STATS_EVERY:])/len(buy_choice_list[-AGGREGATE_STATS_EVERY:])
+        average_hold_choices = sum(hold_choice_list[-AGGREGATE_STATS_EVERY:])/len(hold_choice_list[-AGGREGATE_STATS_EVERY:])
+        average_sell_choices = sum(sell_choice_list[-AGGREGATE_STATS_EVERY:])/len(sell_choice_list[-AGGREGATE_STATS_EVERY:])
+        
+        min_buy_choices = min(buy_choice_list[-AGGREGATE_STATS_EVERY:])
+        min_hold_choices = min(hold_choice_list[-AGGREGATE_STATS_EVERY:])
+        min_sell_choices = min(sell_choice_list[-AGGREGATE_STATS_EVERY:])
+        
+        max_buy_choices = max(buy_choice_list[-AGGREGATE_STATS_EVERY:])
+        max_hold_choices = max(hold_choice_list[-AGGREGATE_STATS_EVERY:])
+        max_sell_choices = max(sell_choice_list[-AGGREGATE_STATS_EVERY:])
+        
         agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward, epsilon=epsilon, 
                                        average_portfolio_value=average_portfolio_value, min_portfolio_value=min_portfolio_value, 
-                                       max_portfolio_value=max_portfolio_value)
+                                       max_portfolio_value=max_portfolio_value, average_buy_choices=average_buy_choices, average_hold_choices=average_hold_choices, 
+                                       average_sell_choices=average_sell_choices, min_buy_choices=min_buy_choices, min_hold_choices=min_hold_choices,
+                                       min_sell_choices=min_sell_choices, max_buy_choices=max_buy_choices, max_hold_choices=max_hold_choices, max_sell_choices=max_sell_choices)
 
         # Save model, but only when min reward is greater or equal a set value
         if min_reward >= MIN_REWARD:
@@ -560,7 +599,7 @@ for episode in range(EPISODES):
             # Create a callback that saves the model's weights
             cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.ckpt',save_weights_only=True,verbose=1)
             
-        if episode%1000 == 0:
+        if episode%100 == 0:
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
 #             model_tag = f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
 #             print(model_tag)
