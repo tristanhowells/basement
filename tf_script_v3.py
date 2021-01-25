@@ -53,7 +53,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 1001
+DATA_SAMPLES = 10
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -602,7 +602,7 @@ for episode in range(EPISODES):
             print('weights saved - min_reward: ', file_path)
             tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1)
             
-        if episode%500 == 0:
+        if episode%1 == 0:
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
 #             model_tag = f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
 #             print(model_tag)
