@@ -395,12 +395,14 @@ class DQNAgent:
         
         if LOAD_WEIGHTS is not None:
             
+            weights = tf.train.latest_checkpoint(LOAD_WEIGHTS)
+            
             print("...loading model weights...")
             self.model = self.create_model()
-            self.model.load_weights(LOAD_WEIGHTS)
+            self.model.load_weights(weights)
             
             self.target_model = self.create_model()
-            self.target_model.load_weights(LOAD_WEIGHTS)
+            self.target_model.load_weights(weights)
             print("Model weights loaded!")
             
         else:
