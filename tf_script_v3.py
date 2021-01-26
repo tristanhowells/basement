@@ -29,7 +29,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING WEIGTHS
-LOAD_WEIGHTS =  r'./storage/modelsJan-26-2021' #None  #tf.train.latest_checkpoint(checkpoint_dir) filepath or none
+LOAD_WEIGHTS =  r'./modelsJan-26-2021/' #None  #tf.train.latest_checkpoint(checkpoint_dir) filepath or none
 
 
 DISCOUNT = 0.99
