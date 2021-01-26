@@ -490,7 +490,7 @@ class DQNAgent:
 
 
         
-        file_path = f'/artifacts/models{today}'
+        file_path = f'/artifacts/models{today}/'
         self.model_checkpoint_callback =tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1)
   
         # Fit on all samples as one batch, log only on terminal state
