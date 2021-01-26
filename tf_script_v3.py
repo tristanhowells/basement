@@ -29,7 +29,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING WEIGTHS
-LOAD_WEIGHTS =  r'/storage/modelsJan-26-2021/' #None  #tf.train.latest_checkpoint(checkpoint_dir) filepath or none
+LOAD_WEIGHTS =  r'/storage/modelsJan-26-2021/checkpoint' #None  #tf.train.latest_checkpoint(checkpoint_dir) filepath or none
 
 
 DISCOUNT = 0.99
@@ -397,10 +397,10 @@ class DQNAgent:
             
             print("...loading model weights...")
             self.model = self.create_model()
-            self.model = self.model.load_weights(LOAD_WEIGHTS)
+            self.model.load_weights(LOAD_WEIGHTS)
             
             self.target_model = self.create_model()
-            self.target_model = self.target_model.load_weights(LOAD_WEIGHTS)
+            self.target_model.load_weights(LOAD_WEIGHTS)
             print("Model weights loaded!")
             
         else:
