@@ -29,7 +29,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING WEIGTHS
-LOAD_WEIGHTS =  r'/storage/modelsJan-26-2021/' #None  #tf.train.latest_checkpoint(checkpoint_dir) filepath or none
+LOAD_WEIGHTS =  None #r'/storage/modelsJan-26-2021/' #None  #tf.train.latest_checkpoint(checkpoint_dir) filepath or none
 
 
 DISCOUNT = 0.99
@@ -56,7 +56,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 101
+DATA_SAMPLES = 10000
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -407,14 +407,12 @@ class DQNAgent:
             
         else:
         
-#             #Main Model - Train this model every step
-#             self.model = self.create_model()
+            #Main Model - Train this model every step
+            self.model = self.create_model()
 
-#             #Target Model - Predict this model every step
-#             self.target_model = self.create_model()
-#             self.target_model.set_weights(self.model.get_weights())
-            print("FAIL!")
-            quit()
+            #Target Model - Predict this model every step
+            self.target_model = self.create_model()
+            self.target_model.set_weights(self.model.get_weights())
     
     
         #An array with the last n steps for training
@@ -500,15 +498,16 @@ class DQNAgent:
             y.append(current_qs)
 
 
-        #Save Weights object
-        file_path = f'/artifacts/models{today}/'
-        self.model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1),
+#         #Save Weights object
+#         file_path = f'/artifacts/models{today}/'
+#         self.model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1),
         
         #Custom TensorBoard object
         self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
         
-        my_callbacks = [self.tensorboard, self.model_checkpoint_callback] 
-  
+#         my_callbacks = [self.tensorboard, self.model_checkpoint_callback] 
+        my_callbacks = [self.tensorboard]
+    
         # Fit on all samples as one batch, log only on terminal state
         self.model.fit(np.array(X), np.array(y), batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False, callbacks=my_callbacks if terminal_state else None)
 
@@ -617,22 +616,22 @@ for episode in range(EPISODES):
                                 
         # Save model, but only when min reward is greater or equal a set value
         if min_reward >= MIN_REWARD:
-#             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-#             model_tag = f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
-#             print(model_tag)
+            agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
             # Create a callback that saves the model's weights
-            print('weights saved - min_reward: ', file_path)
-            #my_callbacks =  
-            tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1)
-            
+            try:
+                agent.model.save_weights('f'/artifacts/models{today}weights/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}')
+                print("weights saved")
+            except:
+                pass
         if episode%1 == 0:
-#             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-#             model_tag = f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
-#             print(model_tag)
+            agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
             # Create a callback that saves the model's weights
-            print('weights saved - 500 eps: ', file_path)
-            model_checkpoint_callback =tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1,save_best_only=True)
-     
+            try:
+                agent.model.save_weights('f'/artifacts/models{today}weights/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}')
+                print("weights saved")
+            except:
+                pass
+                                         
     # Decay epsilon
     if epsilon > MIN_EPSILON:
         epsilon *= EPSILON_DECAY
