@@ -1,5 +1,8 @@
 #current stable model
 
+#if statement for callbacks 
+#load weights function
+
 import numpy as np
 import pandas as pd
 from tensorflow.keras.models import Sequential, load_model
