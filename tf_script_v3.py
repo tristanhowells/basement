@@ -413,7 +413,9 @@ class DQNAgent:
             #Target Model - Predict this model every step
             self.target_model = self.create_model()
             self.target_model.set_weights(self.model.get_weights())
-    
+        
+        #Custom TensorBoard object
+        self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
     
         #An array with the last n steps for training
         self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
@@ -501,9 +503,7 @@ class DQNAgent:
 #         #Save Weights object
 #         file_path = f'/artifacts/models{today}/'
 #         self.model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1),
-        
-        #Custom TensorBoard object
-        self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
+
         
 #         my_callbacks = [self.tensorboard, self.model_checkpoint_callback] 
         my_callbacks = [self.tensorboard]
