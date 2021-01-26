@@ -397,10 +397,10 @@ class DQNAgent:
             
             print("...loading model weights...")
             self.model = self.create_model()
-            self.model = model.load_weights(LOAD_WEIGHTS)
+            self.model = self.model.load_weights(LOAD_WEIGHTS)
             
             self.target_model = self.create_model()
-            self.target_model = model.load_weights(LOAD_WEIGHTS)
+            self.target_model = self.target_model.load_weights(LOAD_WEIGHTS)
             print("Model weights loaded!")
             
         else:
