@@ -53,7 +53,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 100
+DATA_SAMPLES = 51
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -491,7 +491,7 @@ class DQNAgent:
 
         
         file_path = f'/artifacts/models{today}'
-        self.model_checkpoint_callback =tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1,save_best_only=True)
+        self.model_checkpoint_callback =tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1)
   
         # Fit on all samples as one batch, log only on terminal state
         self.model.fit(np.array(X), np.array(y), batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False, callbacks=[self.tensorboard,self.model_checkpoint_callback] if terminal_state else None)
