@@ -29,7 +29,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING WEIGTHS
-LOAD_WEIGHTS = None  #tf.train.latest_checkpoint(checkpoint_dir) filepath or none
+LOAD_WEIGHTS =  '/storage/ #None  #tf.train.latest_checkpoint(checkpoint_dir) filepath or none
 
 
 DISCOUNT = 0.99
@@ -394,23 +394,26 @@ class DQNAgent:
     def __init__(self):
         
         if LOAD_WEIGHTS is not None:
-        
+            
+            print("...loading model weights...")
             self.model = model.load_weights(LOAD_WEIGHTS)
             self.target_model = model.load_weights(LOAD_WEIGHTS)
+            print("Model weights loaded!")
+            
         else:
         
-            #Main Model - Train this model every step
-            self.model = self.create_model()
+#             #Main Model - Train this model every step
+#             self.model = self.create_model()
 
-            #Target Model - Predict this model every step
-            self.target_model = self.create_model()
-            self.target_model.set_weights(self.model.get_weights())
-       
+#             #Target Model - Predict this model every step
+#             self.target_model = self.create_model()
+#             self.target_model.set_weights(self.model.get_weights())
+            print("FAIL!")
+            quit()
+    
+    
         #An array with the last n steps for training
         self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
-       
-        #Custom TensorBoard object
-        self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
        
         #Uesd to count when time to update target model with main model weights
         self.target_update_counter = 0
@@ -492,12 +495,17 @@ class DQNAgent:
             y.append(current_qs)
 
 
-        
+        #Save Weights object
         file_path = f'/artifacts/models{today}/'
-        self.model_checkpoint_callback =tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1)
+        self.model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1),
+        
+        #Custom TensorBoard object
+        self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
+        
+        my_callbacks = [self.tensorboard, self.model_checkpoint_callback] 
   
         # Fit on all samples as one batch, log only on terminal state
-        self.model.fit(np.array(X), np.array(y), batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False, callbacks=[self.tensorboard,self.model_checkpoint_callback] if terminal_state else None)
+        self.model.fit(np.array(X), np.array(y), batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False, callbacks=my_callbacks if terminal_state else None)
 
         # Update target network counter every episode
         if terminal_state:
@@ -609,6 +617,7 @@ for episode in range(EPISODES):
 #             print(model_tag)
             # Create a callback that saves the model's weights
             print('weights saved - min_reward: ', file_path)
+            #my_callbacks =  
             tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1)
             
         if episode%1 == 0:
