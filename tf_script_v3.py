@@ -619,7 +619,7 @@ for episode in range(EPISODES):
             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
             # Create a callback that saves the model's weights
             try:
-                agent.model.save_weights('f'/artifacts/models{today}weights/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}')
+                agent.model.save_weights(f'/artifacts/models{today}weights/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}')
                 print("weights saved")
             except:
                 pass
@@ -627,7 +627,7 @@ for episode in range(EPISODES):
             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
             # Create a callback that saves the model's weights
             try:
-                agent.model.save_weights('f'/artifacts/models{today}weights/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}')
+                agent.model.save_weights(f'/artifacts/models{today}weights/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}')
                 print("weights saved")
             except:
                 pass
