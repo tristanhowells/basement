@@ -488,8 +488,13 @@ class DQNAgent:
             X.append(current_state)
             y.append(current_qs)
 
+
+        
+        file_path = f'/artifacts/models{today}'
+        self.model_checkpoint_callback =tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1,save_best_only=True)
+  
         # Fit on all samples as one batch, log only on terminal state
-        self.model.fit(np.array(X), np.array(y), batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False, callbacks=[self.tensorboard,model_checkpoint_callback] if terminal_state else None)
+        self.model.fit(np.array(X), np.array(y), batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False, callbacks=[self.tensorboard,self.model_checkpoint_callback] if terminal_state else None)
 
         # Update target network counter every episode
         if terminal_state:
@@ -590,10 +595,7 @@ for episode in range(EPISODES):
                                        max_portfolio_value=max_portfolio_value, average_buy_choices=average_buy_choices, average_hold_choices=average_hold_choices, 
                                        average_sell_choices=average_sell_choices, min_buy_choices=min_buy_choices, min_hold_choices=min_hold_choices,
                                        min_sell_choices=min_sell_choices, max_buy_choices=max_buy_choices, max_hold_choices=max_hold_choices, max_sell_choices=max_sell_choices)
-
-        file_path = f'/artifacts/models{today}'
-        model_checkpoint_callback =tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1,save_best_only=True)
-     
+   
         # Save model, but only when min reward is greater or equal a set value
         if min_reward >= MIN_REWARD:
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
