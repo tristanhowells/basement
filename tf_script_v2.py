@@ -35,8 +35,9 @@ if LOAD_MODEL is not None:
     loaded_model = load_model(LOAD_MODEL)
     print(f'Model {LOAD_MODEL} loaded!')
     print(loaded_model.summary())
-    loaded_model.save(r'/storage/new_test/model.h5')
-    loaded_model = tf.keras.models.load_model(r'/storage/new_test/model.h5')
+    loaded_weights = loaded_model.get_weights()
+#     loaded_model.save(r'/storage/new_test/model.h5')
+#     loaded_model = tf.keras.models.load_model(r'/storage/new_test/model.h5')
 else:
     pass
 
@@ -380,13 +381,22 @@ class ModifiedTensorBoard(TensorBoard):
 class DQNAgent:
     def __init__(self):
         
-     
-        #Main Model - Train this model every step
-        self.model = self.create_model()
+        if LOAD_MODEL is not None:
+            #Main Model - Train this model every step
+            self.model = self.create_model()
+            self.model.set_weights(loaded_weights)
+            
+            #Target Model - Predict this model every step
+            self.target_model = self.create_model()
+            self.target_model.set_weights(loaded_weights))
+            
+        else:
+            #Main Model - Train this model every step
+            self.model = self.create_model()
        
-        #Target Model - Predict this model every step
-        self.target_model = self.create_model()
-        self.target_model.set_weights(self.model.get_weights())
+            #Target Model - Predict this model every step
+            self.target_model = self.create_model()
+            self.target_model.set_weights(self.model.get_weights())
        
         #An array with the last n steps for training
         self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
@@ -399,30 +409,27 @@ class DQNAgent:
        
     def create_model(self):
         
-        if LOAD_MODEL is not None:
-            model = loaded_model
-        else:
-            #CREATE NEW MODEL
-            model = Sequential()
-            model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
-            model.add(Activation('relu'))
-            model.add(Flatten())
+        #CREATE NEW MODEL
+        model = Sequential()
+        model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
+        model.add(Activation('relu'))
+        model.add(Flatten())
 
-            model.add(Dense(256))
-            model.add(Activation('relu'))
-            model.add(Dropout(.2))
+        model.add(Dense(256))
+        model.add(Activation('relu'))
+        model.add(Dropout(.2))
 
-            model.add(Dense(512))
-            model.add(Activation('relu'))
-            model.add(Dropout(.2))
+        model.add(Dense(512))
+        model.add(Activation('relu'))
+        model.add(Dropout(.2))
 
-            model.add(Dense(256))
-            model.add(Activation('relu'))
-            model.add(Dropout(.2))
+        model.add(Dense(256))
+        model.add(Activation('relu'))
+        model.add(Dropout(.2))
     
-            model.add(Dense(env.ACTION_SPACE_SIZE, activation='linear')) #ACTION_SPACE_SIZE = how many choice (3)
-            model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
-            print("model = scratch")
+        model.add(Dense(env.ACTION_SPACE_SIZE, activation='linear')) #ACTION_SPACE_SIZE = how many choice (3)
+        model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
+        print("model = scratch")
         return model
 
     #Adds step's data to a memory replay array
