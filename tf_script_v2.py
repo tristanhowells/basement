@@ -35,8 +35,8 @@ if LOAD_MODEL is not None:
     loaded_model = load_model(LOAD_MODEL)
     print(f'Model {LOAD_MODEL} loaded!')
     print(loaded_model.summary())
-    loaded_model.save(r'/storage/new_test/.h5')
-    loaded_model = tf.keras.models.load_model(r'/storage/new_test/.h5')
+    loaded_model.save(r'/storage/new_test/model.h5')
+    loaded_model = tf.keras.models.load_model(r'/storage/new_test/model.h5')
 else:
     pass
 
