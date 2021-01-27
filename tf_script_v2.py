@@ -26,7 +26,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = r'/storage/test/' #filepath or none
+LOAD_MODEL = '/storage/test' #filepath or none
 
 
 DISCOUNT = 0.99
