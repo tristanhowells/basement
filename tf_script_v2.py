@@ -62,7 +62,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 5
+DATA_SAMPLES = 50
 
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
@@ -578,7 +578,7 @@ for episode in range(EPISODES):
 
     end_time = time.time()
     
-    if episode%100 == 0:
+    if episode%1 == 0:
         print(episode+1, " of ", EPISODES, " complete...", (end_time - start_time), "Portfolio Value: ", portfolio_value)
 
     
