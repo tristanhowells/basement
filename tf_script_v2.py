@@ -33,7 +33,7 @@ if LOAD_MODEL is not None:
     print(f'Loading {LOAD_MODEL}')
     loaded_model = load_model(LOAD_MODEL)
     print(f'Model {LOAD_MODEL} loaded!')
-    print(model.summary())
+    print(loaded_model.summary())
 else:
     pass
 
