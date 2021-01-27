@@ -177,7 +177,7 @@ class Trader:
     
     def __init__ (self):
         self.price = 2.5
-        self.kitty = 3000 #will be initilize at the start of an episode and update throughout the episode
+        self.kitty = 10000 #will be initilize at the start of an episode and update throughout the episode
         self.fee = FEE
         self.volume = 0
         self.current_value = 0 
@@ -286,7 +286,7 @@ class MarketEnv:
         self.episode_step = 0
         self.trader.current_value = 0
         self.trader.volume = 0
-        self.trader.kitty = 3000
+        self.trader.kitty = 1000
         self.trader.buy = 0
         self.trader.hold = 0
         self.trader.sell = 0
