@@ -390,6 +390,7 @@ class DQNAgent:
             print(f'Loading {LOAD_MODEL}')
             model = tf.keras.models.load_model(LOAD_MODEL)
             print(f'Model {LOAD_MODEL} loaded!')
+            print(model.summary())
         else:
             ##CREATE NEW MODEL
             model = Sequential()
