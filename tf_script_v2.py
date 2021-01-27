@@ -26,7 +26,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = '/storage/test' #filepath or none
+LOAD_MODEL = r'/storage/test' #filepath or none
 
 
 DISCOUNT = 0.99
@@ -53,7 +53,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 100
+DATA_SAMPLES = 50
 
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
