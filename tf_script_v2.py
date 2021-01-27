@@ -26,7 +26,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = '/storage/test/' #filepath or none
+LOAD_MODEL = r'/storage/test/' #filepath or none
 
 
 DISCOUNT = 0.99
@@ -388,7 +388,7 @@ class DQNAgent:
         
         if LOAD_MODEL is not None:
             print(f'Loading {LOAD_MODEL}')
-            model = load_model(LOAD_MODEL)
+            model = tf.keras.models.load_model(LOAD_MODEL)
             print(f'Model {LOAD_MODEL} loaded!')
         else:
             ##CREATE NEW MODEL
