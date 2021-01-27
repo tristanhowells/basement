@@ -29,6 +29,14 @@ print("Start Date: ", today)
 ###LOAD EXISTING MODEL
 LOAD_MODEL = r'/storage/test/' #filepath or none
 
+if LOAD_MODEL is not None:
+    print(f'Loading {LOAD_MODEL}')
+    loaded_model = load_model(LOAD_MODEL)
+    print(f'Model {LOAD_MODEL} loaded!')
+    print(model.summary())
+else:
+    pass
+
 
 DISCOUNT = 0.99
 REPLAY_MEMORY_SIZE = 50_000  # How many last steps to keep for model training (CHANGE BACK TO ~50_000)
@@ -388,10 +396,7 @@ class DQNAgent:
     def create_model(self):
         
         if LOAD_MODEL is not None:
-            print(f'Loading {LOAD_MODEL}')
-            model = load_model(LOAD_MODEL)
-            print(f'Model {LOAD_MODEL} loaded!')
-            print(model.summary())
+            model = loaded_model
         else:
             ##CREATE NEW MODEL
             model = Sequential()
