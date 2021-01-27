@@ -38,7 +38,7 @@ MIN_REPLAY_MEMORY_SIZE = 5_000  # Minimum number of steps in a memory to start t
 MINIBATCH_SIZE = 64  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
 MODEL_NAME = '4_layer_dqn'
-MIN_REWARD = -100 # For model save
+MIN_REWARD = -50 # For model save
 MEMORY_FRACTION = 0.20
 OBSERVATION_WINDOW = 30
 EPISODE_STEPS = 200
@@ -56,7 +56,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 50
+DATA_SAMPLES = 10000
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -193,7 +193,7 @@ class Trader:
         '''
         if choice == 0:
             if self.volume > 0: #if there is no money in the kitty to purchase volume, pass
-                self.reward = -1
+                self.reward = 0
                 self.volume = self.volume
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
@@ -212,13 +212,13 @@ class Trader:
             
                 #reduce available kitty after purchase
                 self.kitty = self.kitty - (self.fee + self.current_value)
-                self.reward = -1
+                self.reward = 0
                 self.buy += 1
         
         if choice == 1:
             #hold position
             if self.volume == 0: 
-                self.reward = -1
+                self.reward = 0
                 self.volume = self.volume
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
@@ -234,7 +234,7 @@ class Trader:
                 
         if choice == 2:
             if self.volume <= 0: #if there is volume to sell, pass 
-                self.reward = -1
+                self.reward = 0
                 self.volume = self.volume
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
@@ -617,20 +617,10 @@ for episode in range(EPISODES):
         # Save model, but only when min reward is greater or equal a set value
         if min_reward >= MIN_REWARD:
             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-            # Create a callback that saves the model's weights
-            try:
-                agent.model.save_weights(f'/artifacts/models{today}weights/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}')
-                print("weights saved")
-            except:
-                pass
-        if episode%1000 == 0:
+            
+        if episode%5000 == 0:
             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-            # Create a callback that saves the model's weights
-            try:
-                agent.model.save_weights(f'/artifacts/models{today}weights/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}')
-                print("weights saved")
-            except:
-                pass
+            
                                          
     # Decay epsilon
     if epsilon > MIN_EPSILON:
