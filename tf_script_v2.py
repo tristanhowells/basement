@@ -2,7 +2,8 @@
 
 import numpy as np
 import pandas as pd
-from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.models import Sequential 
+from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Activation, Flatten
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import TensorBoard
@@ -26,7 +27,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = r'/storage/test' #filepath or none
+LOAD_MODEL = r'/storage/test/' #filepath or none
 
 
 DISCOUNT = 0.99
@@ -388,7 +389,7 @@ class DQNAgent:
         
         if LOAD_MODEL is not None:
             print(f'Loading {LOAD_MODEL}')
-            model = tf.keras.models.load_model(LOAD_MODEL)
+            model = load_model(LOAD_MODEL)
             print(f'Model {LOAD_MODEL} loaded!')
             print(model.summary())
         else:
