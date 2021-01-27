@@ -388,7 +388,7 @@ class DQNAgent:
             
             #Target Model - Predict this model every step
             self.target_model = self.create_model()
-            self.target_model.set_weights(loaded_weights))
+            self.target_model.set_weights(loaded_weights)
             
         else:
             #Main Model - Train this model every step
