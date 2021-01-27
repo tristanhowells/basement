@@ -505,13 +505,6 @@ class DQNAgent:
             X.append(current_state)
             y.append(current_qs)
 
-
-#         #Save Weights object
-#         file_path = f'/artifacts/models{today}/'
-#         self.model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1),
-
-        
-#         my_callbacks = [self.tensorboard, self.model_checkpoint_callback] 
         my_callbacks = [self.tensorboard]
     
         # Fit on all samples as one batch, log only on terminal state
@@ -528,7 +521,7 @@ class DQNAgent:
 
     #Queries main network for Q values given current observation space (environment state)
     def get_qs(self, state):
-        return self.model.predict(np.array(state).reshape(-1, *state.shape)) ###255 to be repaced with normalizing function
+        return self.model.predict(np.array(state).reshape(-1, *state.shape))
 
 agent = DQNAgent()
 
@@ -565,7 +558,6 @@ for episode in range(EPISODES):
 
         new_state, reward, done = env.step(action)
 
-
         # Transform new continous state to new discrete state and count reward
         episode_reward += reward
 
@@ -584,10 +576,6 @@ for episode in range(EPISODES):
             hold_choice_list.append(hold)
             sell_choice_list.append(sell)
             
-#             print("portfolio_value type", type(portfolio_value), "portfolio_value_list type", type(portfolio_value_list))
-#             print("reward type", type(reward), "episode_reward type", type(episode_reward), "ep_reward type", type(ep_rewards))
-#             print(env.choice_tracker())
-        
     # Append episode reward to a list and log stats (every given number of episodes)
     ep_rewards.append(episode_reward)
     if not episode % AGGREGATE_STATS_EVERY or episode == 1:
@@ -616,28 +604,13 @@ for episode in range(EPISODES):
                                        max_portfolio_value=max_portfolio_value, average_buy_choices=average_buy_choices, average_hold_choices=average_hold_choices, 
                                        average_sell_choices=average_sell_choices, min_buy_choices=min_buy_choices, min_hold_choices=min_hold_choices,
                                        min_sell_choices=min_sell_choices, max_buy_choices=max_buy_choices, max_hold_choices=max_hold_choices, max_sell_choices=max_sell_choices)
-       
-        file_path = f'/artifacts/models{today}'
-        model_checkpoint_callback =tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1,save_best_only=True)
                                 
         # Save model, but only when min reward is greater or equal a set value
         if min_reward >= MIN_REWARD:
             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-            # Create a callback that saves the model's weights
-            try:
-                agent.model.save_weights(f'/artifacts/models{today}weights/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}')
-                print("weights saved")
-            except:
-                pass
         if episode%1000 == 0:
             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-            # Create a callback that saves the model's weights
-            try:
-                agent.model.save_weights(f'/artifacts/models{today}weights/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}')
-                print("weights saved")
-            except:
-                pass
-                                         
+                     
     # Decay epsilon
     if epsilon > MIN_EPSILON:
         epsilon *= EPSILON_DECAY
@@ -648,6 +621,5 @@ for episode in range(EPISODES):
     if episode%100 == 0:
         print(episode+1, " of ", EPISODES, " complete...", (end_time - start_time), "Portfolio Value: ", portfolio_value)
 
-    
 print("100% complete...")
 quit()
