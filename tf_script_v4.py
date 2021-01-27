@@ -402,6 +402,7 @@ class DQNAgent:
     def __init__(self):
         
         if LOAD_MODEL is not None:
+            print("...loading model weights...")
             #Main Model - Train this model every step
             self.model = self.create_model()
             self.model.set_weights(loaded_weights)
@@ -409,6 +410,7 @@ class DQNAgent:
             #Target Model - Predict this model every step
             self.target_model = self.create_model()
             self.target_model.set_weights(loaded_weights)
+            print("...model weights loaded!")
             
         else:
             #Main Model - Train this model every step
