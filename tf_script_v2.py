@@ -384,12 +384,12 @@ class DQNAgent:
             
             #Main Model - Train this model every step
             self.model = self.create_model()
-            self.model.set_weights(model.load_weights(r'/storage/new_test/'))
+            self.model.set_weights(self.model.load_weights(r'/storage/new_test/'))
             
        
             #Target Model - Predict this model every step
             self.target_model = self.create_model()
-            self.target_model.set_weights(model.load_weights(r'/storage/new_test/'))
+            self.target_model.set_weights(self.model.load_weights(r'/storage/new_test/'))
         else:
             
         #Main Model - Train this model every step
