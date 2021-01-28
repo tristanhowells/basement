@@ -38,7 +38,7 @@ MIN_REPLAY_MEMORY_SIZE = 5_000  # Minimum number of steps in a memory to start t
 MINIBATCH_SIZE = 64  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
 MODEL_NAME = '4_layer_dqn'
-MIN_REWARD = -50 # For model save
+MIN_REWARD = 0 # For model save
 MEMORY_FRACTION = 0.20
 OBSERVATION_WINDOW = 30
 EPISODE_STEPS = 200
@@ -280,13 +280,13 @@ class MarketEnv:
 
     def __init__(self):
         self.trader = Trader()
-        self.portfolio_value = 3000
+        self.portfolio_value = 10000
 
     def reset(self):
         self.episode_step = 0
         self.trader.current_value = 0
         self.trader.volume = 0
-        self.trader.kitty = 1000
+        self.trader.kitty = 10000
         self.trader.buy = 0
         self.trader.hold = 0
         self.trader.sell = 0
@@ -615,8 +615,8 @@ for episode in range(EPISODES):
         model_checkpoint_callback =tf.keras.callbacks.ModelCheckpoint(filepath=file_path,save_weights_only=True,verbose=1,save_best_only=True)
                                 
         # Save model, but only when min reward is greater or equal a set value
-        if min_reward >= MIN_REWARD:
-            agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
+#         if min_reward >= MIN_REWARD:
+#             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
             
         if episode%5000 == 0:
             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
