@@ -29,7 +29,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = None #r'/storage/test/.' #filepath or none
+LOAD_MODEL = r'/storage/load_model/.' #filepath or none
 
 if LOAD_MODEL is not None:
     print(f'Loading {LOAD_MODEL}')
@@ -64,7 +64,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 50
+DATA_SAMPLES = 10000
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -185,7 +185,7 @@ class Trader:
     
     def __init__ (self):
         self.price = 2.5
-        self.kitty = 3000 #will be initilize at the start of an episode and update throughout the episode
+        self.kitty = 10000 #will be initilize at the start of an episode and update throughout the episode
         self.fee = FEE
         self.volume = 0
         self.current_value = 0 
@@ -201,7 +201,7 @@ class Trader:
         '''
         if choice == 0:
             if self.volume > 0: #if there is no money in the kitty to purchase volume, pass
-                self.reward = -1
+                self.reward = 0
                 self.volume = self.volume
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
@@ -220,13 +220,13 @@ class Trader:
             
                 #reduce available kitty after purchase
                 self.kitty = self.kitty - (self.fee + self.current_value)
-                self.reward = -1
+                self.reward = 0
                 self.buy += 1
         
         if choice == 1:
             #hold position
             if self.volume == 0: 
-                self.reward = -1
+                self.reward = 0
                 self.volume = self.volume
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
@@ -242,7 +242,7 @@ class Trader:
                 
         if choice == 2:
             if self.volume <= 0: #if there is volume to sell, pass 
-                self.reward = -1
+                self.reward = 0
                 self.volume = self.volume
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
@@ -288,13 +288,13 @@ class MarketEnv:
 
     def __init__(self):
         self.trader = Trader()
-        self.portfolio_value = 3000
+        self.portfolio_value = 10000
 
     def reset(self):
         self.episode_step = 0
         self.trader.current_value = 0
         self.trader.volume = 0
-        self.trader.kitty = 3000
+        self.trader.kitty = 10000
         self.trader.buy = 0
         self.trader.hold = 0
         self.trader.sell = 0
@@ -606,9 +606,9 @@ for episode in range(EPISODES):
                                        min_sell_choices=min_sell_choices, max_buy_choices=max_buy_choices, max_hold_choices=max_hold_choices, max_sell_choices=max_sell_choices)
                                 
         # Save model, but only when min reward is greater or equal a set value
-        if min_reward >= MIN_REWARD:
-            agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-        if episode%1000 == 0:
+#         if min_reward >= MIN_REWARD:
+#             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
+        if episode%5000 == 0:
             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
                      
     # Decay epsilon
