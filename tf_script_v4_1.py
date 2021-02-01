@@ -1,11 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
+#current stable model
 
-#13/01/2020
-
-# pip install pandas
-# pip install tqdm
-# pip install scikit-learn
+#if statement for callbacks 
+#load weights function
 
 import numpy as np
 import pandas as pd
@@ -17,23 +13,39 @@ import tensorflow as tf
 from os import listdir
 from sklearn import preprocessing
 from sklearn.utils import shuffle
-import pickle
 from collections import deque
 import time
 import random
-# from tqdm import tqdm
 import os
 import csv
+from datetime import date
+
+# Month abbreviation, day and year	
+today = date.today()
+today = str(today.strftime("%b-%d-%Y"))
 
 print("tensorflow version: ", tf.__version__)
 print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU'))) 
+print("Start Date: ", today) 
+
+###LOAD EXISTING MODEL
+LOAD_MODEL = r'/storage/load_model/' #filepath or none
+
+if LOAD_MODEL is not None:
+    print(f'Loading {LOAD_MODEL}')
+    loaded_model = load_model(LOAD_MODEL)
+    print(f'Model {LOAD_MODEL} loaded!')
+    print(loaded_model.summary())
+    loaded_weights = loaded_model.get_weights()
+else:
+    pass
 
 DISCOUNT = 0.99
 REPLAY_MEMORY_SIZE = 50_000  # How many last steps to keep for model training (CHANGE BACK TO ~50_000)
 MIN_REPLAY_MEMORY_SIZE = 5_000  # Minimum number of steps in a memory to start training
-MINIBATCH_SIZE = 32  # How many steps (samples) to use for training
+MINIBATCH_SIZE = 64  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
-MODEL_NAME = '256_512_512_256'
+MODEL_NAME = '4_layer_dqn'
 MIN_REWARD = -100 # For model save
 MEMORY_FRACTION = 0.20
 OBSERVATION_WINDOW = 30
@@ -51,8 +63,8 @@ FEE = 20
 AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
-
-DATA_FILE_SAMPLES = 50
+### 500, 1000, 2500, 5000, 10000  
+DATA_SAMPLES = 5000
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -84,6 +96,8 @@ def observation_window(window):
     #returns a list of tuple of (observation_window and current_price)
     observation_windows = [] 
     
+    scaler = preprocessing.StandardScaler().fit(window)
+    
     for e in range(EPISODE_STEPS):
         window_start = e
         window_end = e + OBSERVATION_WINDOW + 1
@@ -94,8 +108,8 @@ def observation_window(window):
         else:
             current_price = window.iloc[e + OBSERVATION_WINDOW][3]
         
-        observation_window = detrend(observation_window)
         observation_window = scaler.transform(observation_window)
+        observation_window = detrend(observation_window)
         
         output = (observation_window, current_price)
        
@@ -105,7 +119,7 @@ def observation_window(window):
 
 # for paperspace instance
 path = r'/storage/data/'
-# path = r'C:\Users\Tristan\Desktop\github_asx_training_repo\asx_data'
+# path = r'H:\asx_data\training_dqn\data'
 
 
 files = find_csv_filenames(path)
@@ -113,63 +127,74 @@ files = find_csv_filenames(path)
 print("number of samples: " , len(files))
 
 original_files = shuffle(files)
-print('shuffled files: ' ,len(original_files))
-files = original_files[0:DATA_FILE_SAMPLES]
+print('shuffled files: ' , len(original_files))
+files = original_files
 
-# #save files list used in this training run for reference
+#save files list used in this training run for reference
 files_path = r'/artifacts/files.csv'
 files_df = pd.DataFrame(files)
 files_df.to_csv(files_path, header=None, index_label=None)
 
-master_data = []
-
-file_counter = 0
-
-for file in files:
-    file_counter += 1
-    file_path = os.path.join(path, file)
-    DATA = pd.read_csv(file_path)
-    DATA.dropna(inplace=True)
-    DATA.drop(['Date','Adj Close'], axis=1, inplace=True)
-    DATA.astype('float')
+def episode_builder(number_of_episodes): 
+    master_data = []
+    file_counter = 0
     
-    scaler = preprocessing.StandardScaler().fit(DATA)
-    
-    data = episode_window(DATA)
+    for file in files:
+        file_counter += 1
+        file_path = os.path.join(path, file)
+        DATA = pd.read_csv(file_path)
+        DATA.dropna(inplace=True)
+        DATA.drop(['Date','Adj Close'], axis=1, inplace=True)
+        DATA.astype('float')
 
-    all_data = []
-    counter = 0
-    for i in range(len(data)):
-        counter += 1
-        cob = observation_window(data[i])
-        all_data.append(cob)
-    print(file_counter, "/", DATA_FILE_SAMPLES, " file: ", file, len(all_data), "windows")
+
+
+        data = episode_window(DATA)
+
+        all_data = []
+        counter = 0
+        for i in range(len(data)):
+            counter += 1
+            cob = observation_window(window=data[i])
+            all_data.append(cob)
+        print(file_counter, "/", len(original_files), " file: ", file, len(all_data), "windows")
+
+        master_data.extend(all_data)
+        print("Number of Episodes: ", len(master_data))
+
+        if len(master_data) >= number_of_episodes:
+            shuffled_data = shuffle(master_data, random_state=0)
+            print("Shuffled Data Len: ", len(shuffled_data))
+
+            EPISODES = len(shuffled_data)
+
+            print("Number of Episodes: ", EPISODES)
         
-    master_data.extend(all_data)
+            return shuffled_data, EPISODES
     
+    return shuffled_data, EPISODES
+            
 
-shuffled_data = shuffle(master_data, random_state=0)
+shuffled_data, EPISODES = episode_builder(DATA_SAMPLES)
 
-# Environment settings
-# EPISODES = len(shuffled_data[0:EPISODES])
+EPISODES = DATA_SAMPLES
+shuffled_data = shuffled_data[0:EPISODES]
 
-print("Shuffled Data Len: ", len(shuffled_data))
-
-EPISODES = len(shuffled_data)
-
-print("Number of Episodes: ", EPISODES)
-
+print("data sample size: ", len(shuffled_data))
 
 class Trader:
     
     def __init__ (self):
         self.price = 2.5
-        self.kitty = 3000 #will be initilize at the start of an episode and update throughout the episode
+        self.kitty = 10000 #will be initilize at the start of an episode and update throughout the episode
         self.fee = FEE
         self.volume = 0
         self.current_value = 0 
         self.purchase_price = 0 
         self.reward = 0
+        self.buy = 0
+        self.hold = 0
+        self.sell = 0
         
     def action(self, choice): 
         '''
@@ -177,11 +202,12 @@ class Trader:
         '''
         if choice == 0:
             if self.volume > 0: #if there is no money in the kitty to purchase volume, pass
-                self.reward = -1
+                self.reward = 0
                 self.volume = self.volume
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
                 self.kitty = self.kitty
+                self.buy += 1
 
             else:
                 #calculate number of shares to buy
@@ -195,30 +221,34 @@ class Trader:
             
                 #reduce available kitty after purchase
                 self.kitty = self.kitty - (self.fee + self.current_value)
-                self.reward = -1
+                self.reward = 0
+                self.buy += 1
         
         if choice == 1:
             #hold position
             if self.volume == 0: 
-                self.reward = -1
+                self.reward = 0
                 self.volume = self.volume
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
                 self.kitty = self.kitty
+                self.hold += 1
             else:
                 self.purchase_price = self.purchase_price
                 self.volume = self.volume 
                 self.kitty = self.kitty
                 self.current_value = self.volume * env.price()
                 self.reward = (self.current_value - self.purchase_price) / self.purchase_price
-                   
+                self.hold += 1
+                
         if choice == 2:
             if self.volume <= 0: #if there is volume to sell, pass 
-                self.reward = -1
+                self.reward = 0
                 self.volume = self.volume
                 self.current_value = self.current_value
                 self.purchase_price = self.purchase_price
                 self.kitty = self.kitty
+                self.sell += 1
             else: #if there is money in the kitty, continue with trade (sell all of the available position)
                 #calculate the estimated value of the kitty after trade
                 self.sale_value = self.volume * env.price()
@@ -234,7 +264,8 @@ class Trader:
                 
                 #reset volume to 0
                 self.volume = 0 
-            
+                self.sell += 1
+                
     def current_value(self, current_value):
     	return self.current_value 
 
@@ -246,7 +277,11 @@ class Trader:
 
     def reward(self):
         return self.reward
+    
+    def choice_tracker(self):
+        return self.buy, self.hold, self.sell
 
+    
 class MarketEnv:
     TIME_STEP_PENALTY = -1 
     OBSERVATION_SPACE_VALUES = (OBSERVATION_WINDOW, 5)
@@ -254,14 +289,17 @@ class MarketEnv:
 
     def __init__(self):
         self.trader = Trader()
-        self.portfolio_value = 3000
+        self.portfolio_value = 10000
 
     def reset(self):
         self.episode_step = 0
         self.trader.current_value = 0
         self.trader.volume = 0
-        self.trader.kitty = 3000
-   
+        self.trader.kitty = 10000
+        self.trader.buy = 0
+        self.trader.hold = 0
+        self.trader.sell = 0
+        
     def step(self, action, reward=-1):
         self.trader.action(action)
         
@@ -285,18 +323,22 @@ class MarketEnv:
         
     def portfolio_value(self):
         portfolio_value = self.portfolio_value
-        
+    
+    def choice_tracker(self):
+        return self.trader.buy, self.trader.hold, self.trader.sell
         
 env = MarketEnv()
 
 # For stats
 ep_rewards = [-200]
 portfolio_value_list = [0]
+buy_choice_list = []
+hold_choice_list = []
+sell_choice_list = []
 
 # For more repetitive results
 random.seed(1)
 np.random.seed(1)
-#tf.set_random_seed(1)
 tf.random.set_seed(1)
 
 # Memory fraction, used mostly when trai8ning multiple agents
@@ -304,17 +346,18 @@ tf.random.set_seed(1)
 #backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
 # Create models folder
-if not os.path.isdir('/artifacts/models'):
-    os.makedirs('/artifacts/models')
+if not os.path.isdir('/artifacts/models' + today):
+    os.makedirs('/artifacts/models' + today)
 
-# Own Tensorboard class
+# if not os.path.isdir('/storage/models' + today):
+#     os.makedirs('/storage/models' + today)
+
 class ModifiedTensorBoard(TensorBoard):
 
     # Overriding init to set initial step and writer (we want one log file for all .fit() calls)
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.step = 1
-       # self.writer = tf.summary.FileWriter(self.log_dir)
         self.writer = tf.summary.create_file_writer(self.log_dir)
 
     # Overriding this method to stop creating default log writer
@@ -347,9 +390,9 @@ class ModifiedTensorBoard(TensorBoard):
             self.step += 1
             self.writer.flush()
 
-    _train_dir = os.path.dirname(os.path.realpath('/artifacts/models'))
-    _log_write_dir = os.path.dirname(os.path.realpath('/artifacts/models'))
-    _should_write_train_graph = False
+    _train_dir = os.path.dirname(os.path.realpath('/artifacts/models' + today))
+    _log_write_dir = os.path.dirname(os.path.realpath('/artifacts/models' + today))
+    _should_write_train_graph = os.path.dirname(os.path.realpath('/artifacts/models' + today))
 
     def _train_step(self):
         pass
@@ -358,49 +401,56 @@ class ModifiedTensorBoard(TensorBoard):
 
 class DQNAgent:
     def __init__(self):
+        
+        if LOAD_MODEL is not None:
+            print("...loading model weights...")
+            #Main Model - Train this model every step
+            self.model = self.create_model()
+            self.model.set_weights(loaded_weights)
+            
+            #Target Model - Predict this model every step
+            self.target_model = self.create_model()
+            self.target_model.set_weights(loaded_weights)
+            print("...model weights loaded!")
+            
+        else:
+            #Main Model - Train this model every step
+            self.model = self.create_model()
        
-        #Main Model - Train this model every step
-        self.model = self.create_model()
-       
-        #Target Model - Predict this model every step
-        self.target_model = self.create_model()
-        self.target_model.set_weights(self.model.get_weights())
-       
+            #Target Model - Predict this model every step
+            self.target_model = self.create_model()
+            self.target_model.set_weights(self.model.get_weights())
+        
+        #Custom TensorBoard object
+        self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
+    
         #An array with the last n steps for training
         self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
-       
-        #Custom TensorBoard object
-        self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs/{}-{}".format(MODEL_NAME, int(time.time())))
        
         #Uesd to count when time to update target model with main model weights
         self.target_update_counter = 0
        
     def create_model(self):
         
-#         try:
-        model = tf.keras.models.load_model(r'/storage/models/256_512_512_256_____2.53max_-106.63avg_-184.02min__1610647079.model')
-        print("model = storage/models/256_512_512_256_____2.53max_-106.63avg_-184.02min__1610647079.model")
-#         else:
-#             model = Sequential()
-#             model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
-#             model.add(Activation('relu'))
-#             model.add(Flatten())
+        model = Sequential()
+        model.add(Dense(150, input_shape=env.OBSERVATION_SPACE_VALUES))
+        model.add(Activation('relu'))
+        model.add(Flatten())
 
-#             model.add(Dense(256))
-#             model.add(Activation('relu'))
-#             model.add(Dropout(.2))
+        model.add(Dense(256))
+        model.add(Activation('relu'))
+        model.add(Dropout(.2))
 
-#             model.add(Dense(512))
-#             model.add(Activation('relu'))
-#             model.add(Dropout(.2))
+        model.add(Dense(512))
+        model.add(Activation('relu'))
+        model.add(Dropout(.2))
 
-#             model.add(Dense(256))
-#             model.add(Activation('relu'))
-#             model.add(Dropout(.2))
+        model.add(Dense(256))
+        model.add(Activation('relu'))
+        model.add(Dropout(.2))
 
-#             model.add(Dense(env.ACTION_SPACE_SIZE, activation='linear')) #ACTION_SPACE_SIZE = how many choice (3)
-#             model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
-#             print("model = scratch")
+        model.add(Dense(env.ACTION_SPACE_SIZE, activation='linear')) #ACTION_SPACE_SIZE = how many choice (3)
+        model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
         return model
 
     #Adds step's data to a memory replay array
@@ -418,10 +468,10 @@ class DQNAgent:
         # Get a minibatch of random samples from memory replay table
         minibatch = random.sample(self.replay_memory, MINIBATCH_SIZE)
 
-        if np.array([transition[0] for transition in minibatch]).shape == (32, 30, 5):
+        if np.array([transition[0] for transition in minibatch]).shape == (64, 30, 5):
             current_states = np.array([np.array(transition[0]) for transition in minibatch])
         else:
-            while np.array([transition[0] for transition in minibatch]).shape != (32, 30, 5):
+            while np.array([transition[0] for transition in minibatch]).shape != (64, 30, 5):
                 minibatch = random.sample(self.replay_memory, MINIBATCH_SIZE)
                 current_states = np.array([np.array(transition[0]) for transition in minibatch])      
 
@@ -456,8 +506,10 @@ class DQNAgent:
             X.append(current_state)
             y.append(current_qs)
 
+        my_callbacks = [self.tensorboard]
+    
         # Fit on all samples as one batch, log only on terminal state
-        self.model.fit(np.array(X), np.array(y), batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False, callbacks=[self.tensorboard] if terminal_state else None)
+        self.model.fit(np.array(X), np.array(y), batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False, callbacks=my_callbacks if terminal_state else None)
 
         # Update target network counter every episode
         if terminal_state:
@@ -470,12 +522,11 @@ class DQNAgent:
 
     #Queries main network for Q values given current observation space (environment state)
     def get_qs(self, state):
-        return self.model.predict(np.array(state).reshape(-1, *state.shape)) ###255 to be repaced with normalizing function
+        return self.model.predict(np.array(state).reshape(-1, *state.shape))
 
 agent = DQNAgent()
 
 # Iterate over episodes
-# for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 for episode in range(EPISODES):
     
     start_time = time.time()
@@ -508,12 +559,8 @@ for episode in range(EPISODES):
 
         new_state, reward, done = env.step(action)
 
-
         # Transform new continous state to new discrete state and count reward
         episode_reward += reward
-
-        #if SHOW_PREVIEW and not episode % AGGREGATE_STATS_EVERY:
-#             env.render()
 
         # Every step we update replay memory and train main network
         agent.update_replay_memory((current_state, action, reward, new_state, done))
@@ -525,9 +572,11 @@ for episode in range(EPISODES):
         if step >= 199:
             portfolio_value = float(env.portfolio_value)
             portfolio_value_list.append(portfolio_value)
-#             print("portfolio_value type", type(portfolio_value), "portfolio_value_list type", type(portfolio_value_list))
-#             print("reward type", type(reward), "episode_reward type", type(episode_reward), "ep_reward type", type(ep_rewards))
-        
+            buy, hold, sell = env.choice_tracker()
+            buy_choice_list.append(buy)
+            hold_choice_list.append(hold)
+            sell_choice_list.append(sell)
+            
     # Append episode reward to a list and log stats (every given number of episodes)
     ep_rewards.append(episode_reward)
     if not episode % AGGREGATE_STATS_EVERY or episode == 1:
@@ -539,20 +588,30 @@ for episode in range(EPISODES):
         min_portfolio_value = min(portfolio_value_list[-AGGREGATE_STATS_EVERY:])
         max_portfolio_value = max(portfolio_value_list[-AGGREGATE_STATS_EVERY:])
         
+        average_buy_choices = sum(buy_choice_list[-AGGREGATE_STATS_EVERY:])/len(buy_choice_list[-AGGREGATE_STATS_EVERY:])
+        average_hold_choices = sum(hold_choice_list[-AGGREGATE_STATS_EVERY:])/len(hold_choice_list[-AGGREGATE_STATS_EVERY:])
+        average_sell_choices = sum(sell_choice_list[-AGGREGATE_STATS_EVERY:])/len(sell_choice_list[-AGGREGATE_STATS_EVERY:])
+        
+        min_buy_choices = min(buy_choice_list[-AGGREGATE_STATS_EVERY:])
+        min_hold_choices = min(hold_choice_list[-AGGREGATE_STATS_EVERY:])
+        min_sell_choices = min(sell_choice_list[-AGGREGATE_STATS_EVERY:])
+        
+        max_buy_choices = max(buy_choice_list[-AGGREGATE_STATS_EVERY:])
+        max_hold_choices = max(hold_choice_list[-AGGREGATE_STATS_EVERY:])
+        max_sell_choices = max(sell_choice_list[-AGGREGATE_STATS_EVERY:])
+        
         agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward, epsilon=epsilon, 
                                        average_portfolio_value=average_portfolio_value, min_portfolio_value=min_portfolio_value, 
-                                       max_portfolio_value=max_portfolio_value)
-
+                                       max_portfolio_value=max_portfolio_value, average_buy_choices=average_buy_choices, average_hold_choices=average_hold_choices, 
+                                       average_sell_choices=average_sell_choices, min_buy_choices=min_buy_choices, min_hold_choices=min_hold_choices,
+                                       min_sell_choices=min_sell_choices, max_buy_choices=max_buy_choices, max_hold_choices=max_hold_choices, max_sell_choices=max_sell_choices)
+                                
         # Save model, but only when min reward is greater or equal a set value
-        if min_reward >= MIN_REWARD:
-            agent.model.save(f'/artifacts/models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-            model_tag = f'/artifacts/models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
-            print(model_tag)
-        if episode%500 == 0:
-            agent.model.save(f'/artifacts/models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-            model_tag = f'/artifacts/models/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model'
-            print(model_tag)
-    
+#         if min_reward >= MIN_REWARD:
+#             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
+        if episode%5000 == 0:
+            agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
+                     
     # Decay epsilon
     if epsilon > MIN_EPSILON:
         epsilon *= EPSILON_DECAY
@@ -561,8 +620,7 @@ for episode in range(EPISODES):
     end_time = time.time()
     
     if episode%100 == 0:
-        print(episode, " of ", EPISODES, " complete...", (end_time - start_time), "Portfolio Value: ", portfolio_value)
+        print(episode+1, " of ", EPISODES, " complete...", (end_time - start_time), "Portfolio Value: ", portfolio_value)
 
-    
 print("100% complete...")
 quit()
