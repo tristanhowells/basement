@@ -29,7 +29,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = None #r'/storage/load_model/' #filepath or none
+LOAD_MODEL = r'/storage/modelsFeb-02-2021/4_layer_dqn____11.74max___-0.08avg__-12.61min__1612343585.model/' #filepath or none
 
 if LOAD_MODEL is not None:
     print(f'Loading {LOAD_MODEL}')
