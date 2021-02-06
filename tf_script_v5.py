@@ -20,6 +20,7 @@ import os
 import csv
 from datetime import date
 
+
 # Month abbreviation, day and year	
 today = date.today()
 today = str(today.strftime("%b-%d-%Y"))
@@ -50,6 +51,7 @@ MIN_REWARD = -100 # For model save
 MEMORY_FRACTION = 0.20
 OBSERVATION_WINDOW = 30
 EPISODE_STEPS = 200
+TIME_STEP_PENALTY = -1
 
 
 # Exploration settings
@@ -64,7 +66,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 10001
+DATA_SAMPLES = 5001
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -183,7 +185,7 @@ shuffled_data = shuffled_data[0:EPISODES]
 print("data sample size: ", len(shuffled_data))
 
 class Trader:
-    TIME_STEP_PENALTY = -1
+
     
     def __init__ (self):
         self.price = 0
@@ -286,6 +288,7 @@ class Trader:
 class MarketEnv: 
     OBSERVATION_SPACE_VALUES = (OBSERVATION_WINDOW, 5)
     ACTION_SPACE_SIZE = 3
+
 
     def __init__(self):
         self.trader = Trader()
@@ -451,6 +454,7 @@ class DQNAgent:
 
         model.add(Dense(env.ACTION_SPACE_SIZE, activation='linear')) #ACTION_SPACE_SIZE = how many choice (3)
         model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
+        
         return model
 
     #Adds step's data to a memory replay array
