@@ -29,7 +29,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = r'/storage/modelsFeb-03-2021/4_layer_dqn____72.54max____1.95avg__-10.63min__1612388867.model/' #filepath or none
+LOAD_MODEL = None #r'/storage/modelsFeb-03-2021/4_layer_dqn____72.54max____1.95avg__-10.63min__1612388867.model/' #filepath or none
 
 if LOAD_MODEL is not None:
     print(f'Loading {LOAD_MODEL}')
@@ -64,7 +64,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 10001
+DATA_SAMPLES = 1000
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -609,7 +609,7 @@ for episode in range(EPISODES):
         # Save model, but only when min reward is greater or equal a set value
 #         if min_reward >= MIN_REWARD:
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-        if episode%5000 == 0:
+        if episode%1000 == 0:
             agent.model.save(f'/storage/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
                      
     # Decay epsilon
