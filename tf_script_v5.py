@@ -19,6 +19,7 @@ import random
 import os
 import csv
 from datetime import date
+import shutil
 
 
 # Month abbreviation, day and year	
@@ -30,7 +31,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = None #r'/storage/modelsFeb-03-2021/4_layer_dqn____72.54max____1.95avg__-10.63min__1612388867.model/' #filepath or none
+LOAD_MODEL = r'/storage/modelsFeb-13-2021/4_layer_dqn___-95.68max_-147.84avg_-200.00min__1613178274.model/' #r'/storage/models/latest/' #None #r'/storage/modelsFeb-03-2021/4_layer_dqn____72.54max____1.95avg__-10.63min__1612388867.model/' #filepath or none
 
 if LOAD_MODEL is not None:
     print(f'Loading {LOAD_MODEL}')
@@ -39,6 +40,12 @@ if LOAD_MODEL is not None:
     print(loaded_model.summary())
     loaded_weights = loaded_model.get_weights()
 else:
+    pass
+
+try:
+    shutil.rmtree(r'/storage/models/latest/')
+except:
+    print ("latest folder not found")
     pass
 
 DISCOUNT = 0.99
@@ -613,8 +620,8 @@ for episode in range(EPISODES):
         # Save model, but only when min reward is greater or equal a set value
 #         if min_reward >= MIN_REWARD:
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-        if episode%5000 == 0:
-            agent.model.save(f'/storage/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
+        if episode%EPISODES == 0:
+            agent.model.save(f'/storage/models/latest/')
                      
     # Decay epsilon
     if epsilon > MIN_EPSILON:
