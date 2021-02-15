@@ -31,7 +31,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = r'/storage/modelsFeb-13-2021/4_layer_dqn___-95.68max_-147.84avg_-200.00min__1613178274.model/' #r'/storage/models/latest/' #None #r'/storage/modelsFeb-03-2021/4_layer_dqn____72.54max____1.95avg__-10.63min__1612388867.model/' #filepath or none
+LOAD_MODEL = r'/storage/models/latest/' #r'/storage/models/latest/' #None #r'/storage/modelsFeb-03-2021/4_layer_dqn____72.54max____1.95avg__-10.63min__1612388867.model/' #filepath or none
 
 if LOAD_MODEL is not None:
     print(f'Loading {LOAD_MODEL}')
@@ -42,11 +42,11 @@ if LOAD_MODEL is not None:
 else:
     pass
 
-try:
-    shutil.rmtree(r'/storage/models/latest/')
-except:
-    print ("latest folder not found")
-    pass
+#try:
+#    shutil.rmtree(r'/storage/models/latest/')
+#except:
+#    print ("latest folder not found")
+#    pass
 
 DISCOUNT = 0.99
 REPLAY_MEMORY_SIZE = 50_000  # How many last steps to keep for model training (CHANGE BACK TO ~50_000)
