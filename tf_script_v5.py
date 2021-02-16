@@ -31,7 +31,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = r'/storage/models/latest/' #r'/storage/models/latest/' #None #r'/storage/modelsFeb-03-2021/4_layer_dqn____72.54max____1.95avg__-10.63min__1612388867.model/' #filepath or none
+LOAD_MODEL = r'/storage/models/latest.0/' #r'/storage/models/latest/' #None #r'/storage/modelsFeb-03-2021/4_layer_dqn____72.54max____1.95avg__-10.63min__1612388867.model/' #filepath or none
 
 if LOAD_MODEL is not None:
     print(f'Loading {LOAD_MODEL}')
@@ -620,7 +620,7 @@ for episode in range(EPISODES):
         # Save model, but only when min reward is greater or equal a set value
 #         if min_reward >= MIN_REWARD:
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-        if episode%EPISODES == 0:
+        if episode = EPISODES-1:
             agent.model.save(f'/storage/models/latest/')
                      
     # Decay epsilon
