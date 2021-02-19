@@ -356,8 +356,8 @@ tf.random.set_seed(1)
 #backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
 # Create models folder
-if not os.path.isdir('/artifacts/models' + today):
-    os.makedirs('/artifacts/models' + today)
+if not os.path.isdir('/storage/models' + today):
+    os.makedirs('/storage/models' + today)
 
 # if not os.path.isdir('/storage/models' + today):
 #     os.makedirs('/storage/models' + today)
@@ -400,9 +400,9 @@ class ModifiedTensorBoard(TensorBoard):
             self.step += 1
             self.writer.flush()
 
-    _train_dir = os.path.dirname(os.path.realpath('/artifacts/models' + today))
-    _log_write_dir = os.path.dirname(os.path.realpath('/artifacts/models' + today))
-    _should_write_train_graph = os.path.dirname(os.path.realpath('/artifacts/models' + today))
+    _train_dir = os.path.dirname(os.path.realpath('/storage/models' + today))
+    _log_write_dir = os.path.dirname(os.path.realpath('/storage/models' + today))
+    _should_write_train_graph = os.path.dirname(os.path.realpath('/storage/models' + today))
 
     def _train_step(self):
         pass
