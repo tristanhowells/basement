@@ -620,7 +620,7 @@ for episode in range(EPISODES):
         # Save model, but only when min reward is greater or equal a set value
 #         if min_reward >= MIN_REWARD:
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
-        if episode == EPISODES-1:
+        if episode == DATA_SAMPLES:
             agent.model.save(f'/storage/models/latest_test/')
                      
     # Decay epsilon
