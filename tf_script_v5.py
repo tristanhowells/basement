@@ -73,7 +73,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 100
+DATA_SAMPLES = 10000
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
