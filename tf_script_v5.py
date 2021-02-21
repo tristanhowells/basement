@@ -432,7 +432,7 @@ class DQNAgent:
             self.target_model.set_weights(self.model.get_weights())
         
         #Custom TensorBoard object
-        self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
+        self.tensorboard = ModifiedTensorBoard(log_dir="/storage/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
     
         #An array with the last n steps for training
         self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
