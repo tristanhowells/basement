@@ -73,7 +73,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 100
+DATA_SAMPLES = 10000
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -621,7 +621,7 @@ for episode in range(EPISODES):
 #         if min_reward >= MIN_REWARD:
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
         
-    if episode%10 == 0:
+    if episode%500 == 0:
         dir = f'/storage/models/latest_{today}/'
         if os.path.exists(dir):
             shutil.rmtree(dir)
