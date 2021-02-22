@@ -627,7 +627,7 @@ for episode in range(EPISODES):
                 shutil.rmtree(dir)
             os.makedirs(dir)
 
-            agent.model.save(f'{dir}_{episode})
+            agent.model.save(f'{dir}_{episode}')
             print("model saved")
             
 #         if episode == (DATA_SAMPLES - 1):
