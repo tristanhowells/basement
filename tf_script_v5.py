@@ -621,14 +621,14 @@ for episode in range(EPISODES):
 #         if min_reward >= MIN_REWARD:
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
         
-        if episode%10 == 0:
-            dir = f'/storage/models/latest_{today}/'
-            if os.path.exists(dir):
-                shutil.rmtree(dir)
-            os.makedirs(dir)
+    if episode%10 == 0:
+        dir = f'/storage/models/latest_{today}/'
+        if os.path.exists(dir):
+            shutil.rmtree(dir)
+        os.makedirs(dir)
 
-            agent.model.save(f'{dir}_{episode}')
-            print("model saved")
+        agent.model.save(f'{dir}_{episode}')
+        print("model saved")
             
 #         if episode == (DATA_SAMPLES - 1):
 #             agent.model.save(f'/storage/models/latest_test/')
