@@ -42,12 +42,6 @@ if LOAD_MODEL is not None:
 else:
     pass
 
-#try:
-#    shutil.rmtree(r'/storage/models/latest/')
-#except:
-#    print ("latest folder not found")
-#    pass
-
 DISCOUNT = 0.99
 REPLAY_MEMORY_SIZE = 50_000  # How many last steps to keep for model training (CHANGE BACK TO ~50_000)
 MIN_REPLAY_MEMORY_SIZE = 5_000  # Minimum number of steps in a memory to start training
@@ -400,9 +394,9 @@ class ModifiedTensorBoard(TensorBoard):
             self.step += 1
             self.writer.flush()
 
-    _train_dir = os.path.dirname(os.path.realpath('/storage/models' + today))
-    _log_write_dir = os.path.dirname(os.path.realpath('/storage/models' + today))
-    _should_write_train_graph = os.path.dirname(os.path.realpath('/storage/models' + today))
+    _train_dir = os.path.dirname(os.path.realpath('/artifacts/models' + today))
+    _log_write_dir = os.path.dirname(os.path.realpath('/artifacts/models' + today))
+    _should_write_train_graph = os.path.dirname(os.path.realpath('/artifacts/models' + today))
 
     def _train_step(self):
         pass
@@ -432,7 +426,7 @@ class DQNAgent:
             self.target_model.set_weights(self.model.get_weights())
         
         #Custom TensorBoard object
-        self.tensorboard = ModifiedTensorBoard(log_dir="/storage/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
+        self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
     
         #An array with the last n steps for training
         self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
