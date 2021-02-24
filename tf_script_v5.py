@@ -622,7 +622,7 @@ for episode in range(EPISODES):
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
         
     if episode%500 == 0 or 1:
-        dir = f'/storage/models/latest_{today}/'
+        dir = f'/artifacts/models/latest_{today}/'
         if os.path.exists(dir):
             shutil.rmtree(dir)
         os.makedirs(dir)
@@ -631,7 +631,7 @@ for episode in range(EPISODES):
         print("model saved")
             
 #         if episode == (DATA_SAMPLES - 1):
-#             agent.model.save(f'/storage/models/latest_test/')
+#             agent.model.save(f'/artifacts/models/latest_test/')
 #             print("model saved")
                      
     # Decay epsilon
