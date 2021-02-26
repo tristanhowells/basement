@@ -350,8 +350,8 @@ tf.random.set_seed(1)
 #backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
 # Create models folder
-if not os.path.isdir('/artifacts/models' + today):
-    os.makedirs('/artifacts/models' + today)
+if not os.path.isdir('/storage/models' + today):
+    os.makedirs('/storage/models' + today)
 
 # if not os.path.isdir('/storage/models' + today):
 #     os.makedirs('/storage/models' + today)
@@ -394,9 +394,9 @@ class ModifiedTensorBoard(TensorBoard):
             self.step += 1
             self.writer.flush()
 
-    _train_dir = os.path.dirname(os.path.realpath('/artifacts/models' + today))
-    _log_write_dir = os.path.dirname(os.path.realpath('/artifacts/models' + today))
-    _should_write_train_graph = os.path.dirname(os.path.realpath('/artifacts/models' + today))
+    _train_dir = os.path.dirname(os.path.realpath('/storage/models' + today))
+    _log_write_dir = os.path.dirname(os.path.realpath('/storage/models' + today))
+    _should_write_train_graph = os.path.dirname(os.path.realpath('/storage/models' + today))
 
     def _train_step(self):
         pass
@@ -426,7 +426,7 @@ class DQNAgent:
             self.target_model.set_weights(self.model.get_weights())
         
         #Custom TensorBoard object
-        self.tensorboard = ModifiedTensorBoard(log_dir="/artifacts/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
+        self.tensorboard = ModifiedTensorBoard(log_dir="/storage/logs{}/{}-{}".format(today, MODEL_NAME, int(time.time())))
     
         #An array with the last n steps for training
         self.replay_memory = deque(maxlen=REPLAY_MEMORY_SIZE)
@@ -616,7 +616,7 @@ for episode in range(EPISODES):
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
         
     if episode%500 == 0 or 1:
-        dir = f'/artifacts/models/latest_{today}/'
+        dir = f'/storage/models/latest_{today}/'
         if os.path.exists(dir):
             shutil.rmtree(dir)
         os.makedirs(dir)
@@ -625,7 +625,7 @@ for episode in range(EPISODES):
         print("model saved")
             
 #         if episode == (DATA_SAMPLES - 1):
-#             agent.model.save(f'/artifacts/models/latest_test/')
+#             agent.model.save(f'/storage/models/latest_test/')
 #             print("model saved")
                      
     # Decay epsilon
