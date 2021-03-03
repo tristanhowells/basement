@@ -31,7 +31,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = r'/storage/models/latest_test/' #r'/storage/models/latest/' #None #r'/storage/modelsFeb-03-2021/4_layer_dqn____72.54max____1.95avg__-10.63min__1612388867.model/' #filepath or none
+LOAD_MODEL = r'/storage/models/latest_Mar-01-2021/_9500/' #r'/storage/models/latest/' #None #r'/storage/modelsFeb-03-2021/4_layer_dqn____72.54max____1.95avg__-10.63min__1612388867.model/' #filepath or none
 
 if LOAD_MODEL is not None:
     print(f'Loading {LOAD_MODEL}')
@@ -616,6 +616,15 @@ for episode in range(EPISODES):
 #             agent.model.save(f'/artifacts/models{today}/{MODEL_NAME}__{max_reward:_>7.2f}max_{average_reward:_>7.2f}avg_{min_reward:_>7.2f}min__{int(time.time())}.model')
         
     if episode%500 == 0:
+        dir = f'/storage/models/latest_{today}/'
+        if os.path.exists(dir):
+            shutil.rmtree(dir)
+        os.makedirs(dir)
+
+        agent.model.save(f'{dir}_{episode}')
+        print("model saved")
+    
+    if episode = EPISODES-1:
         dir = f'/storage/models/latest_{today}/'
         if os.path.exists(dir):
             shutil.rmtree(dir)
