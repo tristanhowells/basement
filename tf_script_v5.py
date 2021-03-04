@@ -624,7 +624,7 @@ for episode in range(EPISODES):
         agent.model.save(f'{dir}_{episode}')
         print("model saved")
     
-    if episode = EPISODES-1:
+    if episode == EPISODES-1:
         dir = f'/storage/models/latest_{today}/'
         if os.path.exists(dir):
             shutil.rmtree(dir)
