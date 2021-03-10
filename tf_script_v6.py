@@ -1,0 +1,1 @@
+#altered reward functiom
