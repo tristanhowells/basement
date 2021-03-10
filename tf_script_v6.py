@@ -244,7 +244,7 @@ class Trader:
                 self.volume = self.volume 
                 self.kitty = self.kitty
                 self.current_value = self.volume * env.price()
-                self.reward = 1 / ((self.kitty + self.current_value) - 10000)
+                self.reward = (self.kitty + self.current_value) - 10000) / 10000
                 self.hold += 1
                 
         if choice == 2:
@@ -263,7 +263,7 @@ class Trader:
                 self.kitty = self.sale_value + self.kitty
                 
                 #calculate reward
-                self.reward = 1 / ((self.kitty + self.current_value) - 10000)
+                self.reward = (self.kitty + self.current_value) - 10000) / 10000
                 
                 #reset current value to 0
                 self.current_value = 0
