@@ -604,7 +604,7 @@ for episode in range(EPISODES):
             if portfolio_change != 0.0:
                 portfolio_vs_market = portfolio_change - market_change
             else:
-                portfolio_vs_market = 0
+                portfolio_vs_market = market_change * -1
                 
 #             print("market change: ", market_change, " portfolio change: ", portfolio_change)
 #             print("portfoilo_vs_market: ", portfolio_vs_market)
