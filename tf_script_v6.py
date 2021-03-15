@@ -69,7 +69,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 10001
+DATA_SAMPLES = 11
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -588,7 +588,7 @@ for episode in range(EPISODES):
         if step == 1:
             start_price = env.price()
 
-        if step == 199:
+        if step == 201:
             portfolio_value = float(env.portfolio_value)
             portfolio_value_list.append(portfolio_value)
             buy, hold, sell = env.choice_tracker()
@@ -596,7 +596,7 @@ for episode in range(EPISODES):
             hold_choice_list.append(hold)
             sell_choice_list.append(sell)
         
-        if step == 199:
+        if step == 201:
             end_price = env.price()
             market_change = (end_price / start_price) - 1
             portfolio_change = (portfolio_value / 10000) - 1
