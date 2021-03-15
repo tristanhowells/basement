@@ -582,13 +582,13 @@ for episode in range(EPISODES):
         current_state = new_state
         
 #         if step <= 199:
-#             print("step: ", step, " price: ", env.price())
+        print("step: ", step, " price: ", env.price())
         
         #calculate Portfolio_Change vs Market_Change
         if step == 1:
             start_price = env.price()
 
-        if step == 200:
+        if step == 199:
             portfolio_value = float(env.portfolio_value)
             portfolio_value_list.append(portfolio_value)
             buy, hold, sell = env.choice_tracker()
@@ -596,7 +596,7 @@ for episode in range(EPISODES):
             hold_choice_list.append(hold)
             sell_choice_list.append(sell)
         
-        if step == 200:
+        if step == 199:
             end_price = env.price()
             market_change = (end_price / start_price) - 1
             portfolio_change = (portfolio_value / 10000) - 1
