@@ -581,8 +581,8 @@ for episode in range(EPISODES):
 
         current_state = new_state
         
-#         if step <= 199:
-        print("step: ", step, " price: ", env.price())
+        if step <= 199:
+            print("step: ", step, " price: ", env.price())
         
         #calculate Portfolio_Change vs Market_Change
         if step == 1:
