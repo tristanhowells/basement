@@ -81,7 +81,6 @@ def detrend(data):
     DATA = data.pct_change()
     DATA = DATA.iloc[1:]
     DATA = pd.DataFrame.to_numpy(DATA)
-    print(DATA)
     return DATA
 
 def episode_window(data):
