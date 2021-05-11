@@ -113,8 +113,8 @@ def observation_window(window):
         else:
             current_price = window.iloc[e + OBSERVATION_WINDOW][3]
         
-        observation_window = scaler.transform(observation_window)
         observation_window = detrend(observation_window)
+        observation_window = scaler.transform(observation_window)
         
         output = (observation_window, current_price)
        
