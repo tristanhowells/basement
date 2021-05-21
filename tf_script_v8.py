@@ -75,15 +75,15 @@ def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
     return [ filename for filename in filenames if filename.endswith( suffix ) ]
 
- def detrend(data):
+def detrend(data):
      #removes trend from timeseries data
-     data = pd.DataFrame(data)
+    data = pd.DataFrame(data)
 #     DATA = data.pct_change()
 #     DATA = DATA.iloc[1:]
 #     DATA.replace([np.inf, np.nan], 0, inplace=True)
 #     DATA = pd.DataFrame.to_numpy(DATA)
-     DATA = data
-     return DATA
+    DATA = data
+    return DATA
 
 def episode_window(data):
     #returns a list of episode_windows
