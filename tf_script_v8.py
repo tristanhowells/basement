@@ -79,8 +79,9 @@ def detrend(data):
      #removes trend from timeseries data
     data = pd.DataFrame(data)
 #     DATA = data.pct_change()
-    DATA = DATA.iloc[1:]
+
     DATA = data
+    DATA = DATA.iloc[1:]
     DATA.replace([np.inf, np.nan], 0, inplace=True)
     DATA = pd.DataFrame.to_numpy(DATA)
     return DATA
