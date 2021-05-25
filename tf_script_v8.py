@@ -117,7 +117,7 @@ def observation_window(window):
         
         #observation_window = detrend(observation_window)
         observation_window = scaler.transform(observation_window)
-        print(np.shape(observation_window))
+
         output = (observation_window, current_price)
        
         observation_windows.append(output)
