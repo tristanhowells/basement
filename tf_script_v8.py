@@ -33,7 +33,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = r'/storage/models/latest_May-11-2021/_2500' 
+LOAD_MODEL = r'/storage/models/latest_May-24-2021/_1000' 
 
 if LOAD_MODEL is not None:
     print(f'Loading {LOAD_MODEL}')
@@ -69,7 +69,7 @@ AGGREGATE_STATS_EVERY = 50  # episodes
 
 ### build Episodes
 ### 500, 1000, 2500, 5000, 10000  
-DATA_SAMPLES = 1001
+DATA_SAMPLES = 10001
 
 def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
@@ -79,8 +79,6 @@ def detrend(data):
      #removes trend from timeseries data
     data = pd.DataFrame(data)
     DATA = data.pct_change()
-
-    
     DATA = DATA.iloc[1:]
     DATA.replace([np.inf, np.nan], 0, inplace=True)
     DATA = pd.DataFrame.to_numpy(DATA)
