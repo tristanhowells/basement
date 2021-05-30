@@ -33,7 +33,7 @@ print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('
 print("Start Date: ", today) 
 
 ###LOAD EXISTING MODEL
-LOAD_MODEL = None #r'/storage/models/latest_May-28-2021/_6000' 
+LOAD_MODEL = r'/storage/models/latest_May-29-2021/_7500' 
 
 if LOAD_MODEL is not None:
     print(f'Loading {LOAD_MODEL}')
