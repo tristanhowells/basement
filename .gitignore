@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Model checkpoints and training outputs
+models/
+logs/
+plots/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
