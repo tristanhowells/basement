@@ -47,6 +47,13 @@ class BettingEnv(gym.Env):
         Extra reward term applied on bust termination. Default -100.
     win_bonus : float
         Extra reward term applied on target reached. Default +100.
+    survival_shaping_scale : float
+        Scale for the per-step survival shaping penalty. At each bet step a
+        quadratic proximity-to-bust term is subtracted from the reward:
+            penalty = -survival_shaping_scale * danger²
+        where danger = 1 − (balance − bust_threshold) / (starting_balance − bust_threshold),
+        clipped to [0, 1].  Near starting balance the penalty is ~0; near bust
+        it approaches -survival_shaping_scale.  Default 0.5.
     min_true_prob : float
         Minimum true win probability for Team A. Controls how extreme
         favorites can be. Default 0.30 (suits most two-team sports).
@@ -74,6 +81,7 @@ class BettingEnv(gym.Env):
         win_threshold: float = 10_000.0,
         bust_penalty: float = -100.0,
         win_bonus: float = 100.0,
+        survival_shaping_scale: float = 0.5,
         min_true_prob: float = 0.30,
         max_true_prob: float = 0.70,
         recent_window: int = 20,
@@ -97,6 +105,7 @@ class BettingEnv(gym.Env):
         self.win_threshold = win_threshold
         self.bust_penalty = bust_penalty
         self.win_bonus = win_bonus
+        self.survival_shaping_scale = survival_shaping_scale
         self.min_true_prob = min_true_prob
         self.max_true_prob = max_true_prob
         self.recent_window = recent_window
@@ -213,6 +222,18 @@ class BettingEnv(gym.Env):
                 (self.balance + 1e-8) / (old_balance + 1e-8)
             )
             reward = float(log_return * self.reward_scale)
+
+            # Survival shaping: quadratic penalty that grows as balance
+            # approaches bust_threshold.  Provides a continuous danger signal
+            # so the agent doesn't wait for the terminal bust penalty to learn
+            # conservative play near ruin.
+            #   danger = 0  at starting_balance (or above)
+            #   danger = 1  at bust_threshold
+            danger = 1.0 - (self.balance - self.bust_threshold) / (
+                self.starting_balance - self.bust_threshold
+            )
+            danger = float(np.clip(danger, 0.0, 1.0))
+            reward -= self.survival_shaping_scale * danger ** 2
 
         self._recent_outcomes.append(1 if bet_won else 0)
         self.current_step += 1
