@@ -7,8 +7,9 @@ Simulates sports betting markets (AFL, NRL, Tennis, Basketball, etc.) with:
   - Continuous action space: team selection + stake proportion
   - Episode ends on bust (<$1) or target (>$10,000)
 
-Observation space (5 features):
-  [implied_prob_a, implied_prob_b, log_balance_norm, step_fraction, recent_win_rate]
+Observation space (6 features):
+  [implied_prob_a, implied_prob_b, log_balance_norm, step_fraction, recent_win_rate,
+   balance_trajectory]
 
 Action space (2 continuous actions, each in [0, 1]):
   action[0]: team selection  — <0.5 = Team A, >=0.5 = Team B
@@ -63,6 +64,11 @@ class BettingEnv(gym.Env):
     recent_window : int
         Number of past bets included in the rolling win-rate observation.
         Default 20.
+    trajectory_window : int
+        Number of past steps over which balance trajectory is measured.
+        The feature reports the normalised log return of the current balance
+        relative to the balance ``trajectory_window`` steps ago (or episode
+        start if fewer steps have elapsed).  Default 10.
     reward_scale : float
         Scales step reward (log return). Default 10.0 keeps rewards in
         a reasonable range while preserving sign and magnitude ordering.
@@ -85,6 +91,7 @@ class BettingEnv(gym.Env):
         min_true_prob: float = 0.30,
         max_true_prob: float = 0.70,
         recent_window: int = 20,
+        trajectory_window: int = 10,
         reward_scale: float = 10.0,
         render_mode=None,
     ):
@@ -109,6 +116,7 @@ class BettingEnv(gym.Env):
         self.min_true_prob = min_true_prob
         self.max_true_prob = max_true_prob
         self.recent_window = recent_window
+        self.trajectory_window = trajectory_window
         self.reward_scale = reward_scale
         self.render_mode = render_mode
 
@@ -118,9 +126,9 @@ class BettingEnv(gym.Env):
 
         # ── Observation space ───────────────────────────────────────────
         # [implied_prob_a, implied_prob_b, log_balance_norm,
-        #  step_fraction, recent_win_rate]
-        low = np.array([0.0, 0.0, -1.0, 0.0, 0.0], dtype=np.float32)
-        high = np.array([1.0, 1.0,  1.0, 1.0, 1.0], dtype=np.float32)
+        #  step_fraction, recent_win_rate, balance_trajectory]
+        low = np.array([0.0, 0.0, -1.0, 0.0, 0.0, -1.0], dtype=np.float32)
+        high = np.array([1.0, 1.0,  1.0, 1.0, 1.0,  1.0], dtype=np.float32)
         self.observation_space = spaces.Box(low=low, high=high, dtype=np.float32)
 
         # ── Action space ────────────────────────────────────────────────
@@ -138,6 +146,7 @@ class BettingEnv(gym.Env):
         self.odds_b: float = 2.0
         self.true_prob_a: float = 0.5
         self._recent_outcomes: deque = deque(maxlen=recent_window)
+        self._balance_history: deque = deque(maxlen=trajectory_window + 1)
 
     # ────────────────────────────────────────────────────────────────────
     # Market helpers
@@ -171,6 +180,8 @@ class BettingEnv(gym.Env):
         self.balance = self.starting_balance
         self.current_step = 0
         self._recent_outcomes.clear()
+        self._balance_history.clear()
+        self._balance_history.append(self.starting_balance)
         self._generate_market()
         return self._get_obs(), {}
 
@@ -236,6 +247,7 @@ class BettingEnv(gym.Env):
             reward -= self.survival_shaping_scale * danger ** 2
 
         self._recent_outcomes.append(1 if bet_won else 0)
+        self._balance_history.append(self.balance)
         self.current_step += 1
 
         # ── Check termination ────────────────────────────────────────
@@ -296,8 +308,20 @@ class BettingEnv(gym.Env):
             else 0.5  # neutral prior at episode start
         )
 
+        # Balance trajectory: normalised log return over the last trajectory_window
+        # steps (or since episode start if fewer steps have elapsed).
+        # Positive = upward trend, negative = downward trend.
+        if len(self._balance_history) >= 2:
+            oldest_bal = self._balance_history[0]
+            log_traj = np.log((self.balance + 1e-8) / (oldest_bal + 1e-8))
+            norm_factor = max(abs(self._log_bust), abs(self._log_win))
+            balance_trajectory = float(np.clip(log_traj / norm_factor, -1.0, 1.0))
+        else:
+            balance_trajectory = 0.0
+
         return np.array(
-            [implied_prob_a, implied_prob_b, log_bal_norm, step_frac, recent_win_rate],
+            [implied_prob_a, implied_prob_b, log_bal_norm, step_frac, recent_win_rate,
+             balance_trajectory],
             dtype=np.float32,
         )
 
