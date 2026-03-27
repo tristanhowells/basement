@@ -48,6 +48,20 @@ class BettingEnv(gym.Env):
         Extra reward term applied on bust termination. Default -100.
     win_bonus : float
         Extra reward term applied on target reached. Default +100.
+    timeout_penalty : float
+        Reward term applied when the episode is truncated (step cap hit without
+        reaching bust or target).  Penalises the "tread water" strategy where
+        the agent survives indefinitely without making progress toward the
+        target.  Default -10.
+    progress_shaping_scale : float
+        Scale for a per-step progress-toward-target reward applied at every
+        step, including no-bet steps:
+            progress = log(balance / starting_balance) / log(win_threshold / starting_balance)
+        Ranges from −1 (at bust) through 0 (at starting_balance) to +1 (at
+        win_threshold).  Unlike the log-return step reward, this rewards the
+        agent for *being* at a high balance, not just for growing this step —
+        creating a continuous gradient toward the target even when no bet is
+        placed.  Default 0.1.
     survival_shaping_scale : float
         Scale for the per-step survival shaping penalty. At each bet step a
         quadratic proximity-to-bust term is subtracted from the reward:
@@ -87,6 +101,8 @@ class BettingEnv(gym.Env):
         win_threshold: float = 10_000.0,
         bust_penalty: float = -100.0,
         win_bonus: float = 100.0,
+        timeout_penalty: float = -10.0,
+        progress_shaping_scale: float = 0.1,
         survival_shaping_scale: float = 0.5,
         min_true_prob: float = 0.30,
         max_true_prob: float = 0.70,
@@ -112,6 +128,8 @@ class BettingEnv(gym.Env):
         self.win_threshold = win_threshold
         self.bust_penalty = bust_penalty
         self.win_bonus = win_bonus
+        self.timeout_penalty = timeout_penalty
+        self.progress_shaping_scale = progress_shaping_scale
         self.survival_shaping_scale = survival_shaping_scale
         self.min_true_prob = min_true_prob
         self.max_true_prob = max_true_prob
@@ -204,8 +222,15 @@ class BettingEnv(gym.Env):
             stake = 0.0
             selected_odds = 0.0
             bet_on_a = None
-            # Small neutral reward signal — agent is not penalised for sitting out
-            reward = 0.0
+            # Progress shaping only — no log-return signal on a no-bet.
+            # This means holding a high balance still earns a small positive
+            # reward each step, so sitting-out at $100 is not equivalent to
+            # sitting-out at $5,000.
+            progress = (
+                np.log((self.balance + 1e-8) / self.starting_balance)
+                / self._log_win
+            )
+            reward = float(self.progress_shaping_scale * progress)
         else:
             # Clip stake to available balance (can't over-bet)
             stake = min(intended_stake, self.balance)
@@ -233,6 +258,18 @@ class BettingEnv(gym.Env):
                 (self.balance + 1e-8) / (old_balance + 1e-8)
             )
             reward = float(log_return * self.reward_scale)
+
+            # Progress shaping: continuous reward for being at a high balance
+            # state, not just for the per-step change.  Applied after balance
+            # update so it reflects the new state.
+            #   progress = 0  at starting_balance
+            #   progress = +1 at win_threshold
+            #   progress = −1 at bust_threshold (approx)
+            progress = (
+                np.log((self.balance + 1e-8) / self.starting_balance)
+                / self._log_win
+            )
+            reward += float(self.progress_shaping_scale * progress)
 
             # Survival shaping: quadratic penalty that grows as balance
             # approaches bust_threshold.  Provides a continuous danger signal
@@ -265,6 +302,7 @@ class BettingEnv(gym.Env):
 
         truncated = (not terminated) and (self.current_step >= self.max_steps)
         if truncated:
+            reward += self.timeout_penalty
             terminal_reason = "max_steps"
 
         info = {

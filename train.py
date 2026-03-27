@@ -154,9 +154,13 @@ def train(
     commission_rate: float = 0.05,
     overround: float = 1.05,
     starting_balance: float = 100.0,
+    win_threshold: float = 1_000.0,
     max_steps: int = 500,
     bust_penalty: float = -100.0,
     win_bonus: float = 100.0,
+    timeout_penalty: float = -10.0,
+    progress_shaping_scale: float = 0.1,
+    ent_coef: float = 0.05,
     log_dir: str = "logs",
     model_dir: str = "models",
     seed: int = 42,
@@ -173,9 +177,12 @@ def train(
             "commission_rate": commission_rate,
             "overround": overround,
             "starting_balance": starting_balance,
+            "win_threshold": win_threshold,
             "max_steps": max_steps,
             "bust_penalty": bust_penalty,
             "win_bonus": win_bonus,
+            "timeout_penalty": timeout_penalty,
+            "progress_shaping_scale": progress_shaping_scale,
         }
     )
 
@@ -189,9 +196,12 @@ def train(
         print(f"  Overround      : {overround*100:.1f}%")
         print(f"  Commission     : {commission_rate*100:.1f}%")
         print(f"  Starting bal   : ${starting_balance}")
+        print(f"  Win threshold  : ${win_threshold:,.0f}")
         print(f"  Max steps/ep   : {max_steps}")
         print(f"  Bust threshold : ${preset.get('bust_threshold', 1.0)}")
-        print(f"  Win threshold  : ${preset.get('win_threshold', 10_000)}")
+        print(f"  Timeout penalty: {timeout_penalty:+.1f}")
+        print(f"  Progress scale : {progress_shaping_scale}")
+        print(f"  Entropy coef   : {ent_coef}")
         print(f"{'='*60}\n")
 
     # ── Training environments ────────────────────────────────────────
@@ -237,7 +247,7 @@ def train(
             gamma=0.99,             # discount factor
             gae_lambda=0.95,
             clip_range=0.2,
-            ent_coef=0.01,          # entropy bonus encourages exploration
+            ent_coef=ent_coef,      # entropy bonus encourages exploration
             vf_coef=0.5,
             max_grad_norm=0.5,
             policy_kwargs=dict(net_arch=[128, 128]),
@@ -330,6 +340,14 @@ def parse_args():
                         help="Terminal reward penalty for busting")
     parser.add_argument("--win-bonus", type=float, default=100.0,
                         help="Terminal reward bonus for reaching target")
+    parser.add_argument("--win-threshold", type=float, default=1_000.0,
+                        help="Balance target to end episode as a win (default $1,000)")
+    parser.add_argument("--timeout-penalty", type=float, default=-10.0,
+                        help="Reward penalty applied when episode hits max_steps")
+    parser.add_argument("--progress-shaping", type=float, default=0.1,
+                        help="Scale for per-step progress-toward-target reward")
+    parser.add_argument("--ent-coef", type=float, default=0.05,
+                        help="PPO entropy coefficient (higher = more exploration)")
     parser.add_argument("--log-dir", default="logs",
                         help="TensorBoard log directory")
     parser.add_argument("--model-dir", default="models",
@@ -348,9 +366,13 @@ if __name__ == "__main__":
         commission_rate=args.commission,
         overround=args.overround,
         starting_balance=args.balance,
+        win_threshold=args.win_threshold,
         max_steps=args.max_steps,
         bust_penalty=args.bust_penalty,
         win_bonus=args.win_bonus,
+        timeout_penalty=args.timeout_penalty,
+        progress_shaping_scale=args.progress_shaping,
+        ent_coef=args.ent_coef,
         log_dir=args.log_dir,
         model_dir=args.model_dir,
         seed=args.seed,
