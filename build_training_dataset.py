@@ -267,20 +267,36 @@ def build_dataset(data_dir: Path, out_dir: Path, write_csv: bool = True) -> None
 # CLI
 # ---------------------------------------------------------------------------
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Build flat training dataset from scraped race JSON files."
-    )
-    parser.add_argument("--data-dir", type=str, default="data",
-                        help="Directory containing scraped race JSON files")
-    parser.add_argument("--out-dir", type=str, default="dataset",
-                        help="Output directory for training files")
-    parser.add_argument("--no-csv", action="store_true",
-                        help="Skip writing CSV file")
-    args = parser.parse_args()
+def _is_jupyter() -> bool:
+    try:
+        from IPython import get_ipython
+        return get_ipython() is not None
+    except ImportError:
+        return False
 
-    build_dataset(
-        Path(args.data_dir),
-        Path(args.out_dir),
-        write_csv=not args.no_csv,
-    )
+
+if __name__ == "__main__":
+    if _is_jupyter():
+        # Running inside a Jupyter notebook — set defaults directly here
+        build_dataset(
+            Path("data"),
+            Path("dataset"),
+            write_csv=True,
+        )
+    else:
+        parser = argparse.ArgumentParser(
+            description="Build flat training dataset from scraped race JSON files."
+        )
+        parser.add_argument("--data-dir", type=str, default="data",
+                            help="Directory containing scraped race JSON files")
+        parser.add_argument("--out-dir", type=str, default="dataset",
+                            help="Output directory for training files")
+        parser.add_argument("--no-csv", action="store_true",
+                            help="Skip writing CSV file")
+        args = parser.parse_args()
+
+        build_dataset(
+            Path(args.data_dir),
+            Path(args.out_dir),
+            write_csv=not args.no_csv,
+        )
