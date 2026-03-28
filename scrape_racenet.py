@@ -593,47 +593,56 @@ async def crawl(
 # CLI
 # ---------------------------------------------------------------------------
 
+def _is_jupyter() -> bool:
+    try:
+        from IPython import get_ipython
+        return get_ipython() is not None
+    except ImportError:
+        return False
+
+
+async def _run(days=7, output="data", start_date=None, resume=True, visible=False):
+    """Awaitable entry point — works in both Jupyter (await) and CLI (asyncio.run)."""
+    global HEADLESS
+    if visible:
+        HEADLESS = False
+    sd = datetime.strptime(start_date, "%Y-%m-%d").date() if start_date else None
+    await crawl(days=days, output_dir=Path(output), start_date=sd, resume=resume)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Scrape racenet.com.au horse racing results for DNN/RL training data."
     )
-    parser.add_argument(
-        "--days", type=int, default=7,
-        help="Number of past days to scrape (default: 7)",
-    )
-    parser.add_argument(
-        "--output", type=str, default="data",
-        help="Output directory (default: ./data)",
-    )
-    parser.add_argument(
-        "--start-date", type=str, default=None,
-        help="Start date as YYYY-MM-DD (default: yesterday)",
-    )
-    parser.add_argument(
-        "--no-resume", action="store_true",
-        help="Re-scrape even if already in index",
-    )
-    parser.add_argument(
-        "--visible", action="store_true",
-        help="Run browser in visible (non-headless) mode for debugging",
-    )
+    parser.add_argument("--days", type=int, default=7,
+                        help="Number of past days to scrape (default: 7)")
+    parser.add_argument("--output", type=str, default="data",
+                        help="Output directory (default: ./data)")
+    parser.add_argument("--start-date", type=str, default=None,
+                        help="Start date as YYYY-MM-DD (default: yesterday)")
+    parser.add_argument("--no-resume", action="store_true",
+                        help="Re-scrape even if already in index")
+    parser.add_argument("--visible", action="store_true",
+                        help="Run browser in visible (non-headless) mode for debugging")
     args = parser.parse_args()
 
-    if args.visible:
-        global HEADLESS
-        HEADLESS = False
-
-    start_date = None
-    if args.start_date:
-        start_date = datetime.strptime(args.start_date, "%Y-%m-%d").date()
-
-    asyncio.run(crawl(
+    asyncio.run(_run(
         days=args.days,
-        output_dir=Path(args.output),
-        start_date=start_date,
+        output=args.output,
+        start_date=args.start_date,
         resume=not args.no_resume,
+        visible=args.visible,
     ))
 
 
 if __name__ == "__main__":
-    main()
+    if _is_jupyter():
+        # ----------------------------------------------------------------
+        # Jupyter usage — edit these defaults then run the cell:
+        #
+        #   await _run(days=7, output="data")
+        #
+        # ----------------------------------------------------------------
+        print("Jupyter detected. Run the scraper with:\n\n  await _run(days=7, output='data')\n")
+    else:
+        main()
